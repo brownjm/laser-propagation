@@ -1,0 +1,10 @@
+*~
+
+build
+doc
+tests
+old
+__pycache__
+plotting
+data
+examples
