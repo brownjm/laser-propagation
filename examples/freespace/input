@@ -1,0 +1,49 @@
+[time]
+N = 2048
+T = 200e-15
+wave_min = 200e-9
+wave_max = 4e-6
+
+[space]
+N = 512
+R = 12e-3
+
+[ode]
+abserr = 1e4
+relerr = 0
+first_step = 1e-3
+
+[laser]
+length = 9e-15
+waist = 6e-3
+wavelength = 1.7e-6
+focus = 2
+energy = 1.4e-3
+phase_deg = 0
+delay = -50e-15
+
+[medium]
+medium = air
+rate = ../../data/ionization-oxygen.txt
+fraction = 0.2
+scaling = 1
+n2 = 8e-24
+pressure = 1
+
+[propagation]
+z = 4
+steps = 16
+
+[output]
+temporal_field = E
+spectral_field = A
+electron_density = Rho
+distances = distances.dat
+time = time.dat
+radius = radius.dat
+omega = omega.dat
+kperp = kperp.dat
+wavelength = wavelength.dat
+energy = energy.dat
+max_intensity = max_intensity.dat
+max_density = max_density.dat

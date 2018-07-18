@@ -1,0 +1,57 @@
+[time]
+N = 2048
+T = 200e-15
+wave_min = 300e-9
+filter_min = 400e-9
+filter_max = 1500e-9
+wave_max = 10000e-9
+
+
+[space]
+N = 50
+R = 250e-6
+
+[ode]
+abserr = 1e10
+relerr = 0
+first_step = 1e-3
+
+[laser]
+length = 10e-15
+waist = 180e-6
+wavelength = 1030e-9
+focus = 0
+energy = 30e-6
+phase_deg = 0
+delay = -25e-15
+
+[medium]
+medium = argon
+rate = ../../data/ionization-argon.txt
+fraction = 1
+scaling = 1
+n2 = 20e-24
+pressure = 3.3
+
+[capillary]
+radius = 250e-6
+cladding = 1.45
+modes = 3
+
+[propagation]
+z = 1
+steps = 4
+
+[output]
+temporal_field = E
+spectral_field = A
+electron_density = Rho
+distances = distances.dat
+time = time.dat
+radius = radius.dat
+omega = omega.dat
+kperp = kperp.dat
+wavelength = wavelength.dat
+energy = energy.dat
+max_intensity = max_intensity.dat
+max_density = max_density.dat
