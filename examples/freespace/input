@@ -1,15 +1,17 @@
 [time]
-N = 2048
+N = 1024
 T = 200e-15
-wave_min = 200e-9
+wave_min = 300e-9
+filter_min = 400e-9
+filter_max = 2500e-9
 wave_max = 4e-6
 
 [space]
-N = 512
+N = 256
 R = 12e-3
 
 [ode]
-abserr = 1e4
+abserr = 1e6
 relerr = 0
 first_step = 1e-3
 
