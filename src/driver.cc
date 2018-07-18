@@ -18,12 +18,12 @@ void Driver::run(double distance, int steps) {
   // gives the observers the initial data
   notify_observers();
 
-  std::cout << "z [m]    Energy [J]   Imax [W/m^2]    Rhomax [1/m^3]\n";
+  std::cout << "z [m]    Energy [J]   Imax [W/m^2]   Rhomax [1/m^3]\n";
   auto data = propagator.get_data();
   std::cout << std::fixed << std::setprecision(3);
   std::cout<<  current_distance << "    ";
   std::cout << std::scientific << Util::energy(data.field) << "    ";
-  std::cout << Util::max_intensity(data.field) << "       ";
+  std::cout << Util::max_intensity(data.field) << "      ";
   std::cout << Util::max_density(data.electron_density) << "\n";
 
   // advance the simulation forward
@@ -37,7 +37,7 @@ void Driver::run(double distance, int steps) {
     std::cout << std::fixed << std::setprecision(3);
     std::cout<<  current_distance << "    ";
     std::cout << std::scientific << Util::energy(data.field) << "    ";
-    std::cout << Util::max_intensity(data.field) << "       ";
+    std::cout << Util::max_intensity(data.field) << "      ";
     std::cout << Util::max_density(data.electron_density) << "\n";
   }
 
