@@ -1,5 +1,6 @@
 *~
-
+examples/*/*
+!examples/*/input
 build
 doc
 tests
