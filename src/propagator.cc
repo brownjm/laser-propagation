@@ -66,7 +66,7 @@ void Propagator::initialize_linear(const Linear& linear, double omega0) {
       kz(i, j) = linear.kz(kperp, omega);
     }
   }
-  vg = linear.group_velocity(omega0);
+  vg = linear.group_velocity(field.kperp[0], omega0);
 
   // nonlinear coupling coefficient
   for (int i = 0; i < Nkperp; ++i) {

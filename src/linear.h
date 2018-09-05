@@ -13,11 +13,11 @@ public:
 
   virtual std::complex<double> kz(double kperp, double omega) const = 0;
 
-  virtual double group_velocity(double omega0) const {
-    double domega = 0.01 * omega0;
-    double dn = (n(omega0 + domega) - n(omega0 - domega)) / (2 * domega);
-    double k0 = (dn * omega0 + n(omega0)) / Constants::c;
-    double vg = 1.0 / k0;
+  virtual double group_velocity(double kperp, double omega) const {
+    double domega = 1e-3 * omega;
+    double kz_plus = kz(kperp, omega+domega).real();
+    double kz_minus = kz(kperp, omega-domega).real();
+    double vg = (2*domega) / (kz_plus - kz_minus);
     return vg;
   }
 
@@ -55,24 +55,9 @@ public:
     return std::complex<double>(beta, -alpha);
   }
 
-  virtual double group_velocity(double omega0) const override {
-    double np = Medium::pressurize(pressure, n, omega0);
-    double domega = 0.01 * omega0;
-    double np_plus = Medium::pressurize(pressure, n, omega0+domega);
-    double np_minus = Medium::pressurize(pressure, n, omega0-domega);
-    double dn = (np_plus - np_minus) / (2 * domega);
-
-    double k0 = (dn * omega0 + np) / Constants::c;
-    double vg = 1.0 / k0;
-    return vg;
-  }
-
 private:
   double R, nclad, pressure;
 };
-
-
-
 
 
 #endif // LINEAR_H_
