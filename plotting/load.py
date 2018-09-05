@@ -4,7 +4,7 @@ import configparser
 import glob
 import numpy
 from scipy.constants import epsilon_0, c, pi
-
+from scipy.integrate import trapz
 
 
 class Results:
@@ -14,12 +14,12 @@ class Results:
         self.config = load_config(filename)
         self.folder = self.config['folder']
 
-        self.distances = load(self.config['output/distances'])
-        self.time = load(self.config['output/time'])
-        self.radius = load(self.config['output/radius'])
-        self.omega = load(self.config['output/omega'])
-        self.wavelength = load(self.config['output/wavelength'])
-        self.kperp = load(self.config['output/kperp'])
+        self.distances = load(join(self.folder, self.config['output/distances']))
+        self.time = load(join(self.folder, self.config['output/time']))
+        self.radius = load(join(self.folder, self.config['output/radius']))
+        self.omega = load(join(self.folder, self.config['output/omega']))
+        self.wavelength = load(join(self.folder, self.config['output/wavelength']))
+        self.kperp = load(join(self.folder, self.config['output/kperp']))
 
 
     def electric_field(self, requested_distance):
@@ -48,7 +48,7 @@ class Results:
         z = self.distances[i]
         return z, A
 
-        
+
     def spectrum(self, requested_distance):
         """Returns the closest distance and spectrum"""
         i = self._find_nearest(requested_distance)
@@ -57,26 +57,25 @@ class Results:
         z = self.distances[i]
         
         I = 1/2*epsilon_0*c*abs(A)**2
-        kperp = self.kperp
-        spec = kperp.dot(I)
+        spec = trapz(y=I.T, x=self.kperp)
         return z, spec
-
+    
     
     def energy(self):
         """Returns the distances and energy values along propagation"""
-        energies = load(self.config['output/energy'])
+        energies = load(join(self.folder, self.config['output/energy']))
         return self.distances, energies
 
 
     def max_intensity(self):
         """Returns the distances and maximum intensity values along propagation"""
-        maxI = load(self.config['output/max_intensity'])
+        maxI = load(join(self.folder, self.config['output/max_intensity']))
         return self.distances, maxI
 
     
     def max_electron_density(self):
         """Returns the distances and maximum electron density values along propagation"""
-        max_den = load(self.config['output/max_density'])
+        max_den = load(join(self.folder, self.config['output/max_density']))
         return self.distances, max_den
     
     
