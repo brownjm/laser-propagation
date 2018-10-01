@@ -1,10 +1,11 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "driver.h"
 #include "propagator.h"
 #include "observer.h"
 #include "util.h"
-
+#include "timer.h"
 
 
 Driver::Driver(Propagator& prop)
@@ -15,17 +16,38 @@ void Driver::add_observer(std::unique_ptr<Observers::Observer> obs) {
 }
 
 void Driver::run(double distance, int steps) {
+  // log the output to a file
+  std::ofstream output("log");
+  std::ostringstream ss;
+
+  ss << propagator.logger.str();
+  
+  // time execution
+  Timer timer;
+  ss << "Started: " << timer.timestamp() << "\n";
+  std::cout << ss.str();
+  output << ss.str();
+  ss.str(std::string());
+  ss.clear();
+
   // gives the observers the initial data
   notify_observers();
 
-  std::cout << "z [m]    Energy [J]   Imax [W/m^2]   Rhomax [1/m^3]\n";
   auto data = propagator.get_data();
-  std::cout << std::fixed << std::setprecision(3);
-  std::cout<<  current_distance << "    ";
-  std::cout << std::scientific << Util::energy(data.field) << "    ";
-  std::cout << Util::max_intensity(data.field) << "      ";
-  std::cout << Util::max_density(data.electron_density) << "\n";
+  
+  ss << "z [m]    Energy [J]   Imax [W/m^2]   Rhomax [1/m^3]\n";
+  
+  ss << std::fixed << std::setprecision(3);
+  ss << current_distance << "    ";
+  ss << std::scientific << Util::energy(data.field) << "    ";
+  ss << Util::max_intensity(data.field) << "      ";
+  ss << Util::max_density(data.electron_density) << "\n";
 
+  std::cout << ss.str();
+  output << ss.str();
+  ss.str(std::string());
+  ss.clear();
+  
   // advance the simulation forward
   for (int i = 1; i <= steps; ++i) {
     double zi = i * distance / steps;
@@ -34,14 +56,24 @@ void Driver::run(double distance, int steps) {
     notify_observers();
 
     auto data = propagator.get_data();
-    std::cout << std::fixed << std::setprecision(3);
-    std::cout<<  current_distance << "    ";
-    std::cout << std::scientific << Util::energy(data.field) << "    ";
-    std::cout << Util::max_intensity(data.field) << "      ";
-    std::cout << Util::max_density(data.electron_density) << "\n";
+    ss << std::fixed << std::setprecision(3);
+    ss << current_distance << "    ";
+    ss << std::scientific << Util::energy(data.field) << "    ";
+    ss << Util::max_intensity(data.field) << "      ";
+    ss << Util::max_density(data.electron_density) << "\n";
+
+    std::cout << ss.str();
+    output << ss.str();
+    ss.str(std::string());
+    ss.clear();
   }
 
   finalize();
+
+  ss << "Ended:   " << timer.timestamp() << "\n";
+  ss << "Elapsed: " << timer.elapsed() << "\n";
+  std::cout << ss.str();
+  output << ss.str();
 }
 
 void Driver::notify_observers() {

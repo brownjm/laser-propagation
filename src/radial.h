@@ -8,16 +8,19 @@
 
 class Radial {
 public:
-  Radial(int Ntime, double Tmax, double wave_min, double wave_max,
-	 double filter_min, double filter_max,
+  Radial(int Ntime, double time_min, double time_max,
+         double wave_min, double wave_max,
 	 int Nradius, double Rmax, int Nkperp);
   ~Radial();
 
   int Ntime, Nradius, Nomega, Nkperp, index_minimum_frequency;
-  double Tmax, dt, wavelength_min, wavelength_max, Rmax;
+  double time_min, time_max, dt, wavelength_min, wavelength_max, Rmax;
   std::vector<double> time, omega, wavelength, radius, kperp;
   Array2D<std::complex<double>> temporal, spectral;
   std::vector<double> spectral_filter, temporal_filter;
+
+  void initialize_temporal_filter(double time_filter_min, double time_filter_max);
+  void initialize_spectral_filter(double wave_filter_min, double wave_filter_max);
   
   void transform_to_spectral();
   void transform_to_temporal();
@@ -49,9 +52,7 @@ private:
 
 
   void initialize_temporal_domain();
-  void initialize_temporal_filter();
   void initialize_spectral_domain();
-  void initialize_spectral_filter(double filter_min, double filter_max);
   void initialize_radial_domain();
   void apply_temporal_filter();
   void apply_spectral_filter();

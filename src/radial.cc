@@ -7,12 +7,13 @@
 
 
 
-Radial::Radial(int Nt, double T, double wave_min, double wave_max,
-	       double filter_min, double filter_max,
+Radial::Radial(int Nt, double time_min, double time_max,
+               double wave_min, double wave_max,
 	       int Nr, double R, int Nk)
   : Ntime(Nt), Nradius(Nr), Nomega(0), Nkperp(Nk), index_minimum_frequency(0),
-    Tmax(T), dt(Tmax / (Ntime-1)), wavelength_min(wave_min), wavelength_max(wave_max), Rmax(R) {
-
+    time_min(time_min), time_max(time_max),
+    wavelength_min(wave_min), wavelength_max(wave_max), Rmax(R) {
+  dt = (time_max - time_min) / (Ntime - 1);
   if (Nkperp > Nradius) {
     std::ostringstream os;
     os << "Nkperp (" << Nkperp << ") cannot be greater than Nradius (" << Nradius << ")";
@@ -20,9 +21,7 @@ Radial::Radial(int Nt, double T, double wave_min, double wave_max,
   }
 
   initialize_temporal_domain();
-  initialize_temporal_filter();
   initialize_spectral_domain();
-  initialize_spectral_filter(filter_min, filter_max);
   initialize_radial_domain();
 }
 
@@ -49,6 +48,10 @@ void Radial::initialize_temporal_domain() {
   // fftw plan may have written data to the auxillary array if
   // FFTW_{MEASURE,PATIENT,EXHAUSTIVE} is used, therefore we set all values to zero
   std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
+
+  // fill temporal filter values to unity
+  temporal_filter.resize(Ntime);
+  std::fill(std::begin(temporal_filter), std::end(temporal_filter), 1.0);
 }
 
 void Radial::initialize_spectral_domain() {
@@ -58,7 +61,7 @@ void Radial::initialize_spectral_domain() {
 
   index_minimum_frequency = 0;
   for (int i = 0; i < Ntime/2; ++i) {
-    double o = 2*Constants::pi * i / Tmax;
+    double o = 2*Constants::pi * i / (time_max - time_min);
     if (o < omega_min) ++index_minimum_frequency;
     if ((o >= omega_min) && (o <= omega_max)) omega.push_back(o);
   }
@@ -78,43 +81,51 @@ void Radial::initialize_spectral_domain() {
   Nomega = omega.size();
   Aux_hankel.resize(Nradius, Nomega);
   spectral.resize(Nkperp, Nomega);
-}
 
-void Radial::initialize_spectral_filter(double filter_min, double filter_max) {
-  // set up filters
+  // set spectral filter values to unity
   spectral_filter.resize(Nomega);
   std::fill(std::begin(spectral_filter), std::end(spectral_filter), 1.0);
+}
 
-  double filter_omega_min = 2*Constants::pi*Constants::c / filter_max;
-  double filter_omega_max = 2*Constants::pi*Constants::c / filter_min;
+void Radial::initialize_spectral_filter(double wave_filter_min, double wave_filter_max) {
+  double omega_filter_min = 2*Constants::pi*Constants::c / wave_filter_max;
+  double omega_filter_max = 2*Constants::pi*Constants::c / wave_filter_min;
   int low = 0;
   int high = 0;
-  for (int j = 0; j < Nomega; ++j) {
-    if (omega[j] < filter_omega_min) ++low;
-    if (omega[j] < filter_omega_max) ++high;
+  for (auto o : omega) {
+    if (o < omega_filter_min) ++low;
+    if (o < omega_filter_max) ++high;
   }
-  // std::cout << "low  = " << low << "\n";
-  // std::cout << "high = " << high << "\n";
 
   for (int j = 0; j < low; ++j) {
-    spectral_filter[j] = std::pow(std::sin(Constants::pi/2 * j / (low-1)), 2);
+    double sin = std::sin(Constants::pi/2 * j / (low-1));
+    spectral_filter[j] = std::pow(sin, 2);
   }
 
   for (int j = high; j < Nomega; ++j) {
-    spectral_filter[j] = std::pow(std::cos(Constants::pi/2 * (j - high) / (Nomega-high-1)), 2);
+    double cos = std::cos(Constants::pi/2 * (j - high) / (Nomega-high-1));
+    spectral_filter[j] = std::pow(cos, 2);
   }
   
   IO::write("spectral_filter.dat", spectral_filter);
 }
 
-void Radial::initialize_temporal_filter() {
-  temporal_filter.resize(Ntime);
-  std::fill(std::begin(temporal_filter), std::end(temporal_filter), 1.0);
-  int width = Ntime / 5;
-  for (int j = 0; j < width; ++j) {
-    double w = std::pow(std::sin(Constants::pi/2 * j / (width-1)), 2);
-    temporal_filter[j] = w;
-    temporal_filter[Ntime-1 - j] = w;
+void Radial::initialize_temporal_filter(double time_min, double time_max) {
+  int low = 0;
+  int high = 0;
+  for (auto t : time) {
+    if (t < time_min) ++low;
+    if (t < time_max) ++high;
+  }
+
+  for (int j = 0; j < low; ++j) {
+    double sin = std::sin(Constants::pi/2 * j / (low-1));
+    temporal_filter[j] = std::pow(sin, 2);
+  }
+
+  for (int j = high; j < Ntime; ++j) {
+    double cos = std::cos(Constants::pi/2 * (j - high) / (Ntime-high-1));
+    temporal_filter[j] = std::pow(cos, 2);
   }
 
   IO::write("temporal_filter.dat", temporal_filter);
@@ -144,7 +155,7 @@ void Radial::initialize_radial_domain() {
       dht(i, j) = 2.0 * J0 / (J1*J1*S);
     }
   }
-  //IO::write("hankel.dat", dht.vec());
+  IO::write("hankel.dat", dht.vec());
 }
 
 

@@ -21,24 +21,31 @@ int main(int argc, char* argv[]) {
     
     // coordinates
     int Ntime = p.get<int>("time/N");
-    double T = p.get<double>("time/T");
+    double time_min = p.get<double>("time/time_min");
+    double time_max = p.get<double>("time/time_max");
     double wave_min = p.get<double>("time/wave_min");
     double wave_max = p.get<double>("time/wave_max");
     int Nradius = p.get<int>("space/N");
     double R = p.get<double>("space/R");
     int Nkperp = p.get<int>("capillary/modes");
 
-    double filter_min = p.get<double>("time/filter_min");
-    double filter_max = p.get<double>("time/filter_max");
-    
     double abserr = p.get<double>("ode/abserr");
     double relerr = p.get<double>("ode/relerr");
     double first_step = p.get<double>("ode/first_step");
 
-    Propagator prop(Ntime, T, wave_min, wave_max, filter_min, filter_max,
+    Propagator prop(Ntime, time_min, time_max, wave_min, wave_max,
 		    Nradius, R, Nkperp,
 		    abserr, relerr, first_step);
 
+
+    double time_filter_min = p.get<double>("time/time_filter_min");
+    double time_filter_max = p.get<double>("time/time_filter_max");
+    double wave_filter_min = p.get<double>("time/wave_filter_min");
+    double wave_filter_max = p.get<double>("time/wave_filter_max");
+    prop.initialize_filters(time_filter_min, time_filter_max,
+                            wave_filter_min, wave_filter_max);
+    
+    
     // input field
     double length = p.get<double>("laser/length");
     double waist = p.get<double>("laser/waist");
@@ -105,11 +112,11 @@ int main(int argc, char* argv[]) {
     double z = p.get<double>("propagation/z");
     int steps = p.get<int>("propagation/steps");
 
-    Timer timer;
-    std::cout << "Started: " << timer.timestamp() << "\n";
+    // Timer timer;
+    // std::cout << "Started: " << timer.timestamp() << "\n";
     driver.run(z, steps);
-    std::cout << "Ended:   " << timer.timestamp() << "\n";
-    std::cout << "Elapsed: " << timer.elapsed() << "\n";
+    // std::cout << "Ended:   " << timer.timestamp() << "\n";
+    // std::cout << "Elapsed: " << timer.elapsed() << "\n";
   }
   catch (std::exception& err) {
     std::cerr << err.what() << "\n";

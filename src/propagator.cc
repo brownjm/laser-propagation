@@ -9,16 +9,16 @@
 #include <iomanip>
 #include <limits>
 
-Propagator::Propagator(int Nt, double T, double wave_min, double wave_max,
-		       double filter_min, double filter_max,
+Propagator::Propagator(int Nt, double time_min, double time_max,
+                       double wave_min, double wave_max,
 		       int Nr, double R, int Nk,
 		       double abs_err, double rel_err, double first_step)
-  :field(Nt, T, wave_min, wave_max, filter_min, filter_max, Nr, R, Nk),
-   Pkerr(Nt, T, wave_min, wave_max, filter_min, filter_max, Nr, R, Nk),
-   Jnon(Nt, T, wave_min, wave_max, filter_min, filter_max, Nr, R, Nk),
-   Jplasma(Nt, T, wave_min, wave_max, filter_min, filter_max, Nr, R, Nk),
+  :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+   Pkerr(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+   Jnon(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+   Jplasma(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    Rho(Nr, Nt),
-   RhoE(Nt, T, wave_min, wave_max, filter_min, filter_max, Nr, R, Nk),
+   RhoE(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    Ntime(Nt), Nradius(Nr), vg(0), n2(0),
    fraction(1),
    kz(field.Nkperp, field.Nomega),
@@ -32,19 +32,17 @@ Propagator::Propagator(int Nt, double T, double wave_min, double wave_max,
 
   std::vector<double> wavelengths;
   for (auto o : field.omega) wavelengths.push_back(2*Constants::pi*Constants::c / o);
-  // IO::write("wavelength.dat", wavelengths);
-  std::cout << "Requested Wavelengths: (" << wave_min << ", " << wave_max << ")\n";
-  std::cout << "Supported Wavelengths: (" << wavelengths.back() << ", " << wavelengths.front() << ")\n";
 
-
-  std::cout << "Ntime    =  " << Ntime << "\n";
-  std::cout << "Nomega   = " << Nomega << "\n";
-
-  std::cout << "Nradius  =  " << Nradius << "\n";
-  std::cout << "Nkperp   = " << Nkperp << "\n";
+  // log message about computation box size and parameters
+  logger << "Requested Wavelengths: (" << wave_min << ", " << wave_max << ")\n";
+  logger << "Supported Wavelengths: (" << wavelengths.back() << ", " << wavelengths.front() << ")\n";
+  logger << "Ntime    =  " << Ntime << "\n";
+  logger << "Nomega   = " << Nomega << "\n";
+  logger << "Nradius  =  " << Nradius << "\n";
+  logger << "Nkperp   = " << Nkperp << "\n";
 
   // ode solver
-  std::cout << "ODE size = " << A.vec().size() << " complex<double>\n\n";
+  logger << "ODE size = " << A.vec().size() << " complex<double>\n\n";
   system = {RHSfunction, nullptr, 2*A.vec().size(), this};
 
   driver = gsl_odeiv2_driver_alloc_y_new(&system, gsl_odeiv2_step_rkf45, first_step,
@@ -115,6 +113,15 @@ void Propagator::initialize_rate(const std::string& filename, double frac,
   scaling = scale;
 }
 
+
+void Propagator::initialize_filters(double time_filter_min, double time_filter_max,
+                                    double wave_filter_min, double wave_filter_max) {
+  std::vector<std::reference_wrapper<Radial>> fields = {field, Pkerr, Jnon, Jplasma, RhoE};
+  for (auto f : fields) {
+    f.get().initialize_temporal_filter(time_filter_min, time_filter_max);
+    f.get().initialize_spectral_filter(wave_filter_min, wave_filter_max);
+  }
+}
 
 void Propagator::linear_step(Radial& radial, double dz) {
   std::complex<double> imagi(0, 1);

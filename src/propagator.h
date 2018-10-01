@@ -1,6 +1,7 @@
 #ifndef PROPAGATOR_H_
 #define PROPAGATOR_H_
 
+#include <sstream>
 #include <functional>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv2.h>
@@ -14,8 +15,8 @@ class Linear;
 
 class Propagator {
 public:
-  Propagator(int Ntime, double T, double wave_min, double wave_max,
-	     double filter_min, double filter_max,
+  Propagator(int Ntime, double time_min, double time_max,
+             double wave_min, double wave_max,
 	     int Nradius, double R, int Nkperp,
 	     double abs_err, double rel_error, double first_step);
   ~Propagator();
@@ -25,6 +26,9 @@ public:
   void initialize_pressure(double pressure);
   void initialize_rate(const std::string& filename, double fraction,
 		       double scaling);
+
+  void initialize_filters(double time_filter_min, double time_filter_max,
+                          double wave_filter_min, double wave_filter_max);
 
   void linear_step(Radial& radial, double dz);
   void linear_step(const std::complex<double>* A, Radial& radial, double dz);
@@ -54,6 +58,9 @@ public:
   double z, abserr, relerr, first_step;
   gsl_odeiv2_system system;
   gsl_odeiv2_driver* driver;
+
+  // logging
+  std::stringstream logger;
 };
 
 int RHSfunction(double z, const double y[], double dy[], void* p);
