@@ -55,9 +55,28 @@ class Results:
         filename = self._make_filename(self.config['output/spectral_field'], i)
         A = load_binary(filename, len(self.kperp), len(self.omega))
         z = self.distances[i]
-        
+
+
         I = 1/2*epsilon_0*c*abs(A)**2
-        spec = trapz(y=I.T, x=self.kperp)
+        k = self.kperp
+
+        # To integrate in kperp space, we use cylindrical rings where
+        # each ring is centered at 1/2 (k[i] + k[i-1])
+        N = len(k)
+        weights = numpy.zeros(N)
+
+        if N == 1:
+            # if only one point in k, the weight is a cylinder with radius = 3/2 k
+            weights[0] = pi * (1.5 * k[0])**2
+        else:
+            weights[0] = pi * ((k[1] + k[0]) / 2)**2
+            for i in range(1, N-1):
+                weights[i] = pi * ((k[i+1] + k[i]) / 2)**2 - weights[i-1]
+
+            # k-point beyond last one is found by extrapolation
+            weights[-1] = pi * ((3*k[-1] - k[-2]) / 2)**2 - weights[-2]
+
+        spec = weights.dot(I)
         return z, spec
     
     
