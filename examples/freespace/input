@@ -1,10 +1,13 @@
 [time]
 N = 1024
-T = 200e-15
+time_min = -100e-15
+time_max = 100e-15
+time_filter_min = -90e-15
+time_filter_max = 90e-15
 wave_min = 300e-9
+wave_max = 4e-6
 filter_min = 400e-9
 filter_max = 2500e-9
-wave_max = 4e-6
 
 [space]
 N = 256
