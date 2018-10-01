@@ -169,14 +169,6 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   // 2: transform A to E
   field.transform_to_temporal();
 
-  // int start = 3*Ntime / 4;
-  // for (int i = 0; i < Nradius; ++i) {
-  //   for (int j = start; j < Ntime; ++j) {
-  //     double absorb = 32*std::pow(std::sin(Constants::pi/2 * (j-start) / (Ntime-start-1)), 2);
-  //     field.rt(i, j) *= std::exp(-absorb*z);
-  //   }
-  // }
-
   // 3: calculate nonlinearities
   const double rhoneut = 2.5e25 * pressure;
   const double Ui = 2.5250303e-18;
