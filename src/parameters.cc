@@ -133,7 +133,7 @@ void Parameters::print(std::ostream& os) {
   for (iterator it = begin(); it != end(); ++it) {
     os << it->first << ": " << it->second << "\n";
   }
-  std::cout << "\n";
+  os << "\n";
 }
 
 
