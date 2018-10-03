@@ -19,9 +19,10 @@ namespace IO {
 
   std::string enumerate_filename(const std::string& filename, int i);
 
-  // clear contents of file
-  void clear_contents(const std::string& filename);
+
+  void clear_contents(const std::string& filename);   // clear contents of file
   void write_append(const std::string& filename, double value);
+  void write_append(const std::string& filename, const std::string& text);
 }
 
 #endif // IO_H_

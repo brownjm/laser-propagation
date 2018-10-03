@@ -72,3 +72,9 @@ void IO::write_append(const std::string& filename, double value) {
   output << std::scientific;
   output << value << "\n";
 }
+
+void IO::write_append(const std::string& filename, const std::string& text) {
+  std::ofstream output(filename, std::ios::out | std::ios::app);
+  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  output << text;
+}
