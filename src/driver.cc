@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <sstream>
+#include "io.h"
 #include "driver.h"
 #include "propagator.h"
 #include "observer.h"
@@ -17,18 +18,13 @@ void Driver::add_observer(std::unique_ptr<Observers::Observer> obs) {
 
 void Driver::run(double distance, int steps) {
   // log the output to a file
-  std::ofstream output("log");
   std::ostringstream ss;
-
-  ss << propagator.logger.str();
+  ss << propagator.log_grid_info();
   
   // time execution
   Timer timer;
+  ss << "*** Runtime values ***\n";
   ss << "Started: " << timer.timestamp() << "\n";
-  std::cout << ss.str();
-  output << ss.str();
-  ss.str(std::string());
-  ss.clear();
 
   // gives the observers the initial data
   notify_observers();
@@ -44,7 +40,7 @@ void Driver::run(double distance, int steps) {
   ss << Util::max_density(data.electron_density) << "\n";
 
   std::cout << ss.str();
-  output << ss.str();
+  IO::write_append("log", ss.str());
   ss.str(std::string());
   ss.clear();
   
@@ -62,8 +58,9 @@ void Driver::run(double distance, int steps) {
     ss << Util::max_intensity(data.field) << "      ";
     ss << Util::max_density(data.electron_density) << "\n";
 
+
     std::cout << ss.str();
-    output << ss.str();
+    IO::write_append("log", ss.str());
     ss.str(std::string());
     ss.clear();
   }
@@ -73,7 +70,7 @@ void Driver::run(double distance, int steps) {
   ss << "Ended:   " << timer.timestamp() << "\n";
   ss << "Elapsed: " << timer.elapsed() << "\n";
   std::cout << ss.str();
-  output << ss.str();
+  IO::write_append("log", ss.str());
 }
 
 void Driver::notify_observers() {

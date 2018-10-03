@@ -33,16 +33,6 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
   std::vector<double> wavelengths;
   for (auto o : field.omega) wavelengths.push_back(2*Constants::pi*Constants::c / o);
 
-  // log message about computation box size and parameters
-  logger << "Requested Wavelengths: (" << wave_min << ", " << wave_max << ")\n";
-  logger << "Supported Wavelengths: (" << wavelengths.back() << ", " << wavelengths.front() << ")\n";
-  logger << "Ntime    =  " << Ntime << "\n";
-  logger << "Nomega   = " << Nomega << "\n";
-  logger << "Nradius  =  " << Nradius << "\n";
-  logger << "Nkperp   = " << Nkperp << "\n";
-
-  // ode solver
-  logger << "ODE size = " << A.vec().size() << " complex<double>\n\n";
   system = {RHSfunction, nullptr, 2*A.vec().size(), this};
 
   driver = gsl_odeiv2_driver_alloc_y_new(&system, gsl_odeiv2_step_rkf45, first_step,
@@ -53,6 +43,23 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
 
 Propagator::~Propagator() {
   gsl_odeiv2_driver_free(driver);
+}
+
+std::string Propagator::log_grid_info() {
+  // log message about computation box size and parameters
+  double wave_min = 2*Constants::pi*Constants::c / field.omega.back();
+  double wave_max = 2*Constants::pi*Constants::c / field.omega.front();
+  std::stringstream ss;
+  ss << "*** Computational Grid ***\n";
+  ss << "Supported Wavelengths: (" << wave_min << ", " << wave_max << ")\n";
+  ss << "Ntime    =  " << Ntime << "\n";
+  ss << "Nomega   = " << Nomega << "\n";
+  ss << "Nradius  =  " << Nradius << "\n";
+  ss << "Nkperp   = " << Nkperp << "\n";
+
+  // ode solver
+  ss << "ODE size = " << A.vec().size() << " complex<double>\n\n";
+  return ss.str();
 }
 
 void Propagator::initialize_linear(const Linear& linear, double omega0) {

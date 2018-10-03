@@ -7,6 +7,7 @@
 #include "linear.h"
 #include "observers.h"
 #include "timer.h"
+#include "io.h"
 
 
 int main(int argc, char* argv[]) {
@@ -17,7 +18,6 @@ int main(int argc, char* argv[]) {
 
   try {
     Parameters::Parameters p(argv[1]);
-    p.print(std::cout);
     
     // coordinates
     int Ntime = p.get<int>("time/N");
@@ -110,11 +110,13 @@ int main(int argc, char* argv[]) {
     double z = p.get<double>("propagation/z");
     int steps = p.get<int>("propagation/steps");
 
-    Timer timer;
-    std::cout << "Started: " << timer.timestamp() << "\n";
+
+    std::stringstream ss;
+    p.print(ss);
+    IO::clear_contents("log");
+    IO::write_append("log", ss.str());
+    std::cout << ss.str();
     driver.run(z, steps);
-    std::cout << "Ended:   " << timer.timestamp() << "\n";
-    std::cout << "Elapsed: " << timer.elapsed() << "\n";
   }
   catch (std::exception& err) {
     std::cerr << err.what() << "\n";

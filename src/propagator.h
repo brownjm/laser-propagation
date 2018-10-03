@@ -20,6 +20,7 @@ public:
 	     int Nradius, double R, int Nkperp,
 	     double abs_err, double rel_error, double first_step);
   ~Propagator();
+  std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
   void initialize_field(const Field::Field& field);
   void initialize_kerr(double n2);
@@ -58,9 +59,6 @@ public:
   double z, abserr, relerr, first_step;
   gsl_odeiv2_system system;
   gsl_odeiv2_driver* driver;
-
-  // logging
-  std::stringstream logger;
 };
 
 int RHSfunction(double z, const double y[], double dy[], void* p);
