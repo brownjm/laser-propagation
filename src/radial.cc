@@ -28,7 +28,7 @@ Radial::Radial(int Nt, double time_min, double time_max,
 void Radial::initialize_temporal_domain() {
   // construct temporal coordinates
   for (int i = 0; i < Ntime; ++i) {
-    double t = (i - Ntime/2) * dt;
+    double t = i*dt + time_min;
     time.push_back(t);
   }
   temporal.resize(Nradius, Ntime);
