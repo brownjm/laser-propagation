@@ -26,8 +26,7 @@ add_executable(freespace.out
   src/electron_density.cc
   )
 
-target_compile_options(freespace.out PUBLIC -Ofast -Wall -Wextra -pedantic)
-# target_compile_options(freespace.out PUBLIC -ggdb -Wall -pedantic)
+target_compile_options(freespace.out PUBLIC -Ofast -Wall -Wextra -pedantic -DHAVE_INLINE)
 target_link_libraries(freespace.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES})
 
 
@@ -53,15 +52,5 @@ add_executable(capillary.out
   src/electron_density.cc
   )
 
-target_compile_options(capillary.out PUBLIC -Ofast -Wall -Wextra -pedantic)
-#target_compile_options(capillary.out PUBLIC -ggdb -Wall -Wextra -pedantic)
+target_compile_options(capillary.out PUBLIC -Ofast -Wall -Wextra -pedantic -DHAVE_INLINE)
 target_link_libraries(capillary.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES})
-
-# add_executable(test-perf-radial.out
-#   src/test-perf-radial.cc
-#   src/perf-radial.cc
-#   src/io.cc
-#   )
-# target_compile_options(test-perf-radial.out PUBLIC -Ofast -Wall -Wextra -pedantic)
-# #target_compile_options(test-perf-radial.out PUBLIC -ggdb -Wall -Wextra -pedantic)
-# target_link_libraries(test-perf-radial.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES})
