@@ -88,3 +88,25 @@ double Util::max_intensity(const Radial& field) {
 double Util::max_density(const Array2D<double>& rho) {
   return *std::max_element(std::begin(rho.values), std::end(rho.values));
 }
+
+Util::IntegratorSimps::IntegratorSimps(double dt)
+  :dt(dt), f0(0), f1(0), f2(0), f3(0), F(0),
+   a(3.0/8.0), b(19.0/24.0), c(-5.0/24.0), d(1.0/24.0) {}
+
+double Util::IntegratorSimps::add(double new_value) {
+  f0 = new_value * dt;
+  F += a*f0 + b*f1 + c*f2 + d*f3;
+  f3 = f2;
+  f2 = f1;
+  f1 = f0;
+  return F;
+}
+
+Util::IntegratorTrapz::IntegratorTrapz(double dt)
+  : dt(dt), F(0), old_value(0) {}
+
+double Util::IntegratorTrapz::add(double new_value) {
+  F += 0.5 * (new_value + old_value) * dt;
+  old_value = new_value;
+  return F;
+}

@@ -22,20 +22,10 @@ namespace Util {
   double max_density(const Array2D<double>& rho);
 
 
-  
   class IntegratorSimps {
   public:
-    IntegratorSimps(double dt)
-      :dt(dt), f0(0), f1(0), f2(0), f3(0), F(0),
-       a(3.0/8.0), b(19.0/24.0), c(-5.0/24.0), d(1.0/24.0) {}
-    double add(double value) {
-      f0 = value * dt;
-      F += a*f0 + b*f1 + c*f2 + d*f3;
-      f3 = f2;
-      f2 = f1;
-      f1 = f0;
-      return F;
-    }
+    IntegratorSimps(double dt);
+    double add(double value);
     
   private:
     double dt, f0, f1, f2, f3, F;
@@ -44,14 +34,8 @@ namespace Util {
 
   class IntegratorTrapz {
   public:
-    IntegratorTrapz(double dt)
-      : dt(dt), F(0), old_value(0) {}
-
-    double add(double new_value) {
-      F += 0.5 * (new_value + old_value) * dt;
-      old_value = new_value;
-      return F;
-    }
+    IntegratorTrapz(double dt);
+    double add(double value);
 
   private:
     double dt, F, old_value;
