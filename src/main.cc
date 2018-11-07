@@ -18,6 +18,9 @@ int main(int argc, char* argv[]) {
 
   try {
     Parameters::Parameters p(argv[1]);
+
+    // check which simulation is requested
+    std::string sim_type = p.get<std::string>("simulation/type");
     
     // coordinates
     int Ntime = p.get<int>("time/N");
@@ -25,16 +28,26 @@ int main(int argc, char* argv[]) {
     double time_max = p.get<double>("time/time_max");
     double wave_min = p.get<double>("time/wave_min");
     double wave_max = p.get<double>("time/wave_max");
-
     int Nradius = p.get<int>("space/N");
     double R = p.get<double>("space/R");
+
+    int Nkperp;
+    if (sim_type == "capillary") {
+      Nkperp = p.get<int>("capillary/modes");
+    }
+    else if (sim_type == "freespace") {
+      Nkperp = Nradius;
+    }
+    else {
+      throw std::runtime_error("Unsupported simulation: " + sim_type + "\nOptions are capillary or freespace");
+    }
 
     double abserr = p.get<double>("ode/abserr");
     double relerr = p.get<double>("ode/relerr");
     double first_step = p.get<double>("ode/first_step");
 
     Propagator prop(Ntime, time_min, time_max, wave_min, wave_max,
-		    Nradius, R, Nradius,
+		    Nradius, R, Nkperp,
 		    abserr, relerr, first_step);
 
 
@@ -68,14 +81,23 @@ int main(int argc, char* argv[]) {
     std::string rate_filename = p.get<std::string>("medium/rate");
     double fraction = p.get<double>("medium/fraction");
     double scaling = p.get<double>("medium/scaling");
-    prop.initialize_rate(rate_filename, fraction, scaling);
-
+    double density_of_neutrals = p.get<double>("medium/density_of_neutrals");
     double pressure = p.get<double>("medium/pressure");
+    prop.add_ionization(std::make_unique<Ionization::Tabulated>(rate_filename, density_of_neutrals, fraction, pressure, scaling));
+
     prop.initialize_pressure(pressure);
 
-    auto linear = FreeSpace(index);
-    prop.initialize_linear(linear, omega0);
-
+    if (sim_type == "capillary") {
+      double radius = p.get<double>("capillary/radius");
+      double cladding = p.get<double>("capillary/cladding");
+      auto linear = Capillary(index, radius, cladding, pressure);
+      prop.initialize_linear(linear, omega0);
+    }
+    else if (sim_type == "freespace") {
+      auto linear = FreeSpace(index);
+      prop.initialize_linear(linear, omega0);
+    }
+    
     prop.calculate_electron_density();
 
 
@@ -109,7 +131,6 @@ int main(int argc, char* argv[]) {
 
     double z = p.get<double>("propagation/z");
     int steps = p.get<int>("propagation/steps");
-
 
     std::stringstream ss;
     p.print(ss);

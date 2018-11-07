@@ -1,3 +1,6 @@
+[simulation]
+type = freespace
+
 [time]
 N = 1024
 time_min = -100e-15
@@ -6,8 +9,8 @@ time_filter_min = -90e-15
 time_filter_max = 90e-15
 wave_min = 300e-9
 wave_max = 4e-6
-filter_min = 400e-9
-filter_max = 2500e-9
+wave_filter_min = 400e-9
+wave_filter_max = 2500e-9
 
 [space]
 N = 256
@@ -32,6 +35,7 @@ medium = air
 rate = ../../data/ionization-oxygen.txt
 fraction = 0.2
 scaling = 1
+density_of_neutrals = 2.5e25
 n2 = 8e-24
 pressure = 1
 

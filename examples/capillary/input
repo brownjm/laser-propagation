@@ -1,3 +1,6 @@
+[simulation]
+type = capillary
+
 [time]
 N = 2048
 time_min = -100e-15
@@ -33,6 +36,7 @@ medium = argon
 rate = ../../data/ionization-argon.txt
 fraction = 1
 scaling = 1
+density_of_neutrals = 2.5e25
 n2 = 20e-24
 pressure = 3.3
 
