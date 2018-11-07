@@ -21,7 +21,7 @@ namespace Ionization {
       for (int j = 0; j < electric_field.Ntime; ++j) {
         double E = electric_field.rt(i, j).real();
         double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(E, 2);
-        double rate = scaling * interp->operator()(2*I);
+        double rate = scaling * ionization_rate(2*I);
         double probability = integrator.add(rate);
         electron_density(i, j) = density_of_neutrals * pressure * ionizing_fraction * probability;
       }

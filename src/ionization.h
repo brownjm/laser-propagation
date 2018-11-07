@@ -14,6 +14,7 @@ namespace Ionization {
   
   class Ionization {
   public:
+    virtual double ionization_rate(double) {return 0;}
     virtual void calculate_electron_density(const Radial& electric_field,
                                             Array2D<double>& electron_density) = 0;
   };
@@ -23,6 +24,10 @@ namespace Ionization {
     Tabulated(const std::string& filename, double density_of_neutrals, double ionizing_fraction, double pressure, double scaling);
     void calculate_electron_density(const Radial& electric_field,
                                     Array2D<double>& electron_density) override;
+
+    double ionization_rate(double I) {
+      return interp->operator()(I);
+    }
 
   private:
     std::string filename;
