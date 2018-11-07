@@ -26,4 +26,6 @@ public:
       }
     }
   }
+
+  double collision_time, pressure;
 };
