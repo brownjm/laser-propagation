@@ -5,25 +5,34 @@
 
 namespace Ionization {
 
-  Tabulated::Tabulated(const std::string& filename, double density_of_neutrals, double ionizing_fraction, double pressure, double scaling)
-    :filename(filename), density_of_neutrals(density_of_neutrals),
-     ionizing_fraction(ionizing_fraction), pressure(pressure), scaling(scaling) {
-    std::vector<double> intensities, rates;
-    IO::read(filename, intensities, rates);
-    interp = std::make_unique<Interpolate>(intensities, rates);
+
+  TabulatedRate::TabulatedRate(const std::string& filename, double scaling)
+    :filename(filename), scaling(scaling) {
+    std::vector<double> intensity, rate;
+    IO::read(filename, intensity, rate);
+    interp = std::make_unique<Interpolate>(intensity, rate);
   }
 
-  void Tabulated::calculate_electron_density(const Radial& electric_field,
-                                             Array2D<double>& electron_density) {
+  double TabulatedRate::ionization_rate(double electric_field) {
+    const double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(electric_field, 2);
+    return interp->operator()(2*I);
+  }
+
+  IonizationModel::IonizationModel(double density_of_neutrals, double ionizing_fraction,
+                                   double pressure, Rate& rate)
+    :density_of_neutrals(pressure*density_of_neutrals), ionizing_fraction(ionizing_fraction),
+     rate(rate) {}
+
+  void IonizationModel::calculate_electron_density(const Radial& electric_field,
+                                              Array2D<double>& electron_density) {
     const double dt = electric_field.time[1] - electric_field.time[0];
     for (int i = 0; i < electric_field.Nradius; ++i) {
       Util::IntegratorTrapz integrator(dt);
       for (int j = 0; j < electric_field.Ntime; ++j) {
         double E = electric_field.rt(i, j).real();
-        double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(E, 2);
-        double rate = scaling * ionization_rate(2*I);
-        double probability = integrator.add(rate);
-        electron_density(i, j) = density_of_neutrals * pressure * ionizing_fraction * probability;
+        double W = rate.ionization_rate(E);
+        double probability = integrator.add(W);
+        electron_density(i, j) = density_of_neutrals * ionizing_fraction * probability;
       }
     }
   }
