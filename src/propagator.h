@@ -10,6 +10,8 @@
 #include "array2d.h"
 #include "ionization.h"
 #include "simulation_data.h"
+#include "nonlinear_response.h"
+
 class Linear;
 
 
@@ -23,14 +25,14 @@ public:
   std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
   void initialize_field(const Field::Field& field);
-  void initialize_kerr(double n2);
-  void initialize_pressure(double pressure);
-  void initialize_rate(const std::string& filename, double fraction,
-		       double scaling);
 
   void initialize_filters(double time_filter_min, double time_filter_max,
                           double wave_filter_min, double wave_filter_max);
 
+  void add_polarization(std::unique_ptr<NonlinearResponse> P);
+  void add_current(std::unique_ptr<NonlinearResponse> J);
+  void add_ionization(std::unique_ptr<Ionization::IonizationModel> ioniz);
+  
   void linear_step(Radial& radial, double dz);
   void linear_step(const std::complex<double>* A, Radial& radial, double dz);
 
@@ -41,20 +43,19 @@ public:
   SimulationData get_data();
   
   Radial field;
-  Radial Pkerr;
-  Radial Jnon;
-  Radial Jplasma;
   Array2D<double> Rho;
-  Radial RhoE;
 
-
-  std::unique_ptr<Ionization::Rate> ionization_rate;
-  std::vector<double> intensity, rate;
   
   int Ntime, Nradius, Nomega, Nkperp;
   double vg, n2, fraction, scaling, pressure;
   Array2D<std::complex<double>> kz, coef, A;
 
+  std::vector<std::unique_ptr<NonlinearResponse>> polarization_responses;
+  std::vector<std::unique_ptr<NonlinearResponse>> current_responses;
+  std::vector<std::unique_ptr<Radial>> polarization_workspaces;
+  std::vector<std::unique_ptr<Radial>> current_workspaces;
+  std::unique_ptr<Ionization::IonizationModel> ionization;
+  
   // ode solver
   double z, abserr, relerr, first_step;
   gsl_odeiv2_system system;

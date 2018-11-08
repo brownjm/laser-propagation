@@ -8,7 +8,9 @@
 #include "observers.h"
 #include "timer.h"
 #include "io.h"
-
+#include "kerr.h"
+#include "plasma.h"
+#include "nonlinear_absorption.h"
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
@@ -75,18 +77,27 @@ int main(int argc, char* argv[]) {
     std::string medium_name = p.get<std::string>("medium/medium");
     auto index = Medium::select_linear_index(medium_name);
     double omega0 = 2*Constants::pi*Constants::c / wavelength;
+    double pressure = p.get<double>("medium/pressure");
     double n2 = p.get<double>("medium/n2");
-    prop.initialize_kerr(n2);
+
+    prop.add_polarization(std::make_unique<Kerr>(n2, pressure));
+    double collision_time = p.get<double>("medium/collision_time");
+    prop.add_current(std::make_unique<Plasma>(collision_time, pressure));
     
+
     std::string rate_filename = p.get<std::string>("medium/rate");
     double fraction = p.get<double>("medium/fraction");
     double scaling = p.get<double>("medium/scaling");
     double density_of_neutrals = p.get<double>("medium/density_of_neutrals");
-    double pressure = p.get<double>("medium/pressure");
-    prop.add_ionization(std::make_unique<Ionization::Tabulated>(rate_filename, density_of_neutrals, fraction, pressure, scaling));
+    double ionization_potential = p.get<double>("medium/ionization_potential");
 
-    prop.initialize_pressure(pressure);
+    Ionization::TabulatedRate rate(rate_filename, scaling);
 
+
+    prop.add_ionization(std::make_unique<Ionization::IonizationModel>(density_of_neutrals, fraction, pressure, rate));
+
+    prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential, density_of_neutrals, pressure, fraction, rate));
+    
     if (sim_type == "capillary") {
       double radius = p.get<double>("capillary/radius");
       double cladding = p.get<double>("capillary/cladding");
@@ -98,8 +109,6 @@ int main(int argc, char* argv[]) {
       prop.initialize_linear(linear, omega0);
     }
     
-    prop.calculate_electron_density();
-
 
     // output files
     std::string fn_temporal = p.get<std::string>("output/temporal_field");
