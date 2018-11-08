@@ -132,7 +132,6 @@ void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
 
 void Propagator::add_ionization(std::unique_ptr<Ionization::IonizationModel> ioniz) {
   ionization = std::move(ioniz);
-  calculate_electron_density();
 }
 
 void Propagator::linear_step(Radial& radial, double dz) {
@@ -164,7 +163,9 @@ void Propagator::nonlinear_step(double& z, double zi) {
 }
 
 void Propagator::calculate_electron_density() {
-  ionization->calculate_electron_density(field, Rho);
+  if (ionization) {
+    ionization->calculate_electron_density(field, Rho);
+  }
 }
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
@@ -207,59 +208,6 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
       }
     }
   }
-
-  
-
-  // const double rhoneut = 2.5e25 * pressure;
-  // const double Ui = 2.5250303e-18;
-  // const double chi3 = 4.0/3.0 * Constants::epsilon_0*Constants::c * n2 * pressure;
-  // const double dt = field.time[1] - field.time[0];
-  // for (int i = 0; i < Nradius; ++i) {
-  //   Util::IntegratorTrapz integrator(dt);
-  //   for (int j = 0; j < Ntime; ++j) {
-  //     double E = field.rt(i, j).real();
-
-  //     // Kerr effect
-  //     double kerr = Constants::epsilon_0 * chi3 * std::pow(E, 3);
-  //     Pkerr.rt(i, j) = kerr;
-
-  //     // optical field ionization
-  //     // double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(E, 2);
-  //     // double W = scaling * ionization_rate->operator()(2*I);
-  //     // double prob = integrator.add(W);
-  //     // double rho = fraction * prob * rhoneut;
-  //     // Rho(i, j) = rho;
-  //     double rho = Rho(i, j);
-  //     RhoE.rt(i, j) = rho * E;
-  //     //Jnon.rt(i, j) = W/(I+1) * Ui * (fraction*rhoneut - rho) * Constants::epsilon_0*Constants::c*E;
-  //   }
-  // }
-
-  // 4: Pkerr(r, t) -> Pkerr(kperp, omega)
-  // add other responses to 4-6
-  // Pkerr.transform_to_spectral();
-  // RhoE.transform_to_spectral();
-  // Jnon.transform_to_spectral();
-
-  // // 5: linear_step(Pkerr.spectral, -z)
-  // linear_step(Pkerr, -z);
-  // linear_step(RhoE, -z);
-  // linear_step(Jnon, -z);
-  
-  // const double tau = 350e-15 / pressure;
-  // // 6: dy[] = i*k/(2*epsilon_0) * Pkerr
-  // std::complex<double> imagi(0, 1);
-  // double pl1 = std::pow(Constants::e, 2) * tau / Constants::m_e;
-  // for (int i = 0; i < Nkperp; ++i) {
-  //   for (int j = 0; j < Nomega; ++j) {
-  //     const double omega = field.omega[j];
-  //     const double ot = omega * tau;
-  //     const std::complex<double> pl2 = (1.0 + imagi*ot) / (1.0 + std::pow(ot, 2));
-  //     Jplasma.kw(i, j) = pl1 * pl2 * RhoE.kw(i, j);
-      
-  //     dA[i*Nomega + j] = coef(i, j) * (Pkerr.kw(i, j) + imagi/omega * (Jplasma.kw(i, j) + Jnon.kw(i, j)));
-  //   }
-  // }
 }
 
 
