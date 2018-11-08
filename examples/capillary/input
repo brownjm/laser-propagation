@@ -39,6 +39,8 @@ scaling = 1
 density_of_neutrals = 2.5e25
 n2 = 20e-24
 pressure = 3.3
+collision_time = 350e-15
+ionization_potential = 2.5250303e-18
 
 [capillary]
 radius = 250e-6
