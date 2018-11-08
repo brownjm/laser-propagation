@@ -103,6 +103,10 @@ void Propagator::initialize_field(const Field::Field& Efield) {
 void Propagator::initialize_filters(double time_filter_min, double time_filter_max,
                                     double wave_filter_min, double wave_filter_max) {
 
+
+  field.initialize_temporal_filter(time_filter_min, time_filter_max);
+  field.initialize_spectral_filter(wave_filter_min, wave_filter_max);
+  
   for (auto& r : polarization_workspaces) {
     r->initialize_temporal_filter(time_filter_min, time_filter_max);
     r->initialize_spectral_filter(wave_filter_min, wave_filter_max);

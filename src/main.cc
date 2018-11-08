@@ -51,15 +51,6 @@ int main(int argc, char* argv[]) {
     Propagator prop(Ntime, time_min, time_max, wave_min, wave_max,
 		    Nradius, R, Nkperp,
 		    abserr, relerr, first_step);
-
-
-    double time_filter_min = p.get<double>("time/time_filter_min");
-    double time_filter_max = p.get<double>("time/time_filter_max");
-    double wave_filter_min = p.get<double>("time/wave_filter_min");
-    double wave_filter_max = p.get<double>("time/wave_filter_max");
-    prop.initialize_filters(time_filter_min, time_filter_max,
-                            wave_filter_min, wave_filter_max);
-    
     
     // input field
     double length = p.get<double>("laser/length");
@@ -107,6 +98,16 @@ int main(int argc, char* argv[]) {
     prop.add_current(std::make_unique<Plasma>(collision_time, pressure));
     prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential, density_of_neutrals, pressure, fraction, rate));    
 
+
+    double time_filter_min = p.get<double>("time/time_filter_min");
+    double time_filter_max = p.get<double>("time/time_filter_max");
+    double wave_filter_min = p.get<double>("time/wave_filter_min");
+    double wave_filter_max = p.get<double>("time/wave_filter_max");
+    prop.initialize_filters(time_filter_min, time_filter_max,
+                            wave_filter_min, wave_filter_max);
+
+
+    
     // output files
     std::string fn_temporal = p.get<std::string>("output/temporal_field");
     std::string fn_spectral = p.get<std::string>("output/spectral_field");
