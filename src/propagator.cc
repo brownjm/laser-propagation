@@ -176,6 +176,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
 
   // 3: calculate nonlinearities
   calculate_electron_density();
+  std::fill(dA, dA + Nkperp*Nomega, 0);
   auto source = std::begin(polarization_responses);
   auto workspace = std::begin(polarization_workspaces);
   for (; source != std::end(polarization_responses); ++source, ++workspace) {
