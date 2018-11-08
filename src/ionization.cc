@@ -15,7 +15,7 @@ namespace Ionization {
 
   double TabulatedRate::ionization_rate(double electric_field) {
     const double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(electric_field, 2);
-    return interp->operator()(2*I);
+    return scaling * interp->operator()(2*I);
   }
 
   IonizationModel::IonizationModel(double density_of_neutrals, double ionizing_fraction,
