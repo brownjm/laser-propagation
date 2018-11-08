@@ -2,8 +2,7 @@
 
 class Kerr : public NonlinearResponse {
 public:
-  Kerr(double n2, double pressure)
-    : n2(n2), pressure(pressure) {
+  Kerr(double n2, double pressure) {
     chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure;
   }
 
@@ -16,5 +15,5 @@ public:
     }
   }
   
-  double n2, pressure, chi3;
+  double chi3;
 };

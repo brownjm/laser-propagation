@@ -2,20 +2,20 @@
 
 class Plasma : public NonlinearResponse {
 public:
-  Plasma(double collision_time, double pressure)
-    : collision_time(collision_time), pressure(pressure) {}
+  Plasma(double collision, double pressure)
+    : collision_time(collision / pressure) {}
 
   void calculate_temporal_response(const Radial& electric_field, const Array2D<double>& electron_density, Radial& response) override {
     for (int i = 0; i < response.Nradius; ++i) {
       for (int j = 0; j < response.Ntime; ++j) {
         const double E = electric_field.rt(i, j).real();
-        response.rt(i, j) = E * electron_density(i, j);
+        response.rt(i, j) = electron_density(i, j) * E;
       }
     }
   }
 
   void finalize_spectral_response(Radial& response) override {
-    const double tau = collision_time / pressure;
+    const double tau = collision_time;
     const double A = std::pow(Constants::e, 2) * tau / Constants::m_e;
     const std::complex<double> imagi(0, 1);
     for (int i = 0; i < response.Nkperp; ++i) {
@@ -27,5 +27,5 @@ public:
     }
   }
 
-  double collision_time, pressure;
+  double collision_time;
 };
