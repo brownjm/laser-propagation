@@ -38,12 +38,13 @@ namespace Ionization {
                     Rate& rate, int Nradius, int Ntime);
     void calculate_electron_density(const Radial& electric_field, Array2D<double>& electron_density);
 
+
+    double density_of_neutrals, ionizing_fraction;
+    Rate& rate;
+
     // for performance, to only calculate the rate once per step
     Array2D<double> cached_rate;
 
-  private:
-    double density_of_neutrals, ionizing_fraction;
-    Rate& rate;
   };
 
 
