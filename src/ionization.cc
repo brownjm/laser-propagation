@@ -19,9 +19,9 @@ namespace Ionization {
   }
 
   IonizationModel::IonizationModel(double density_of_neutrals, double ionizing_fraction,
-                                   double pressure, Rate& rate)
+                                   double pressure, Rate& rate, int Nradius, int Ntime)
     :density_of_neutrals(pressure*density_of_neutrals), ionizing_fraction(ionizing_fraction),
-     rate(rate) {}
+     rate(rate), cached_rate(Nradius, Ntime) {}
 
   void IonizationModel::calculate_electron_density(const Radial& electric_field,
                                               Array2D<double>& electron_density) {
@@ -31,6 +31,7 @@ namespace Ionization {
       for (int j = 0; j < electric_field.Ntime; ++j) {
         double E = electric_field.rt(i, j).real();
         double W = rate.ionization_rate(E);
+        cached_rate(i, j) = W;
         double probability = integrator.add(W);
         electron_density(i, j) = density_of_neutrals * ionizing_fraction * probability;
       }

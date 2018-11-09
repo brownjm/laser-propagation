@@ -31,7 +31,7 @@ public:
 
   void add_polarization(std::unique_ptr<NonlinearResponse> P);
   void add_current(std::unique_ptr<NonlinearResponse> J);
-  void add_ionization(std::unique_ptr<Ionization::IonizationModel> ioniz);
+  void add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz);
   
   void linear_step(Radial& radial, double dz);
   void linear_step(const std::complex<double>* A, Radial& radial, double dz);
@@ -44,7 +44,6 @@ public:
   
   Radial field;
   Array2D<double> Rho;
-
   
   int Ntime, Nradius, Nomega, Nkperp;
   double vg, n2, fraction, scaling, pressure;
@@ -54,7 +53,7 @@ public:
   std::vector<std::unique_ptr<NonlinearResponse>> current_responses;
   std::vector<std::unique_ptr<Radial>> polarization_workspaces;
   std::vector<std::unique_ptr<Radial>> current_workspaces;
-  std::unique_ptr<Ionization::IonizationModel> ionization;
+  std::shared_ptr<Ionization::IonizationModel> ionization;
   
   // ode solver
   double z, abserr, relerr, first_step;

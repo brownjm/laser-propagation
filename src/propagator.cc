@@ -134,8 +134,8 @@ void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
                                                         field.Nradius, field.Rmax, field.Nkperp));
 }
 
-void Propagator::add_ionization(std::unique_ptr<Ionization::IonizationModel> ioniz) {
-  ionization = std::move(ioniz);
+void Propagator::add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz) {
+  ionization = ioniz;
 }
 
 void Propagator::linear_step(Radial& radial, double dz) {

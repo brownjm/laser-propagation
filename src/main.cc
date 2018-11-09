@@ -90,13 +90,14 @@ int main(int argc, char* argv[]) {
     }
 
     Ionization::TabulatedRate rate(rate_filename, scaling);
-    prop.add_ionization(std::make_unique<Ionization::IonizationModel>(density_of_neutrals, fraction, pressure, rate));
+    auto ionization_model = std::make_shared<Ionization::IonizationModel>(density_of_neutrals, fraction, pressure, rate, Ntime, Nradius);
+    prop.add_ionization(ionization_model);
 
     prop.calculate_electron_density();
     
     prop.add_polarization(std::make_unique<Kerr>(n2, pressure));
     prop.add_current(std::make_unique<Plasma>(collision_time, pressure));
-    prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential, density_of_neutrals, pressure, fraction, rate));    
+    prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential, density_of_neutrals, pressure, fraction, ionization_model));
 
 
     double time_filter_min = p.get<double>("time/time_filter_min");

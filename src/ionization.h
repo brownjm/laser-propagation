@@ -27,7 +27,7 @@ namespace Ionization {
   private:
     std::string filename;
     double scaling;
-    std::unique_ptr<Interpolate> interp;    
+    std::unique_ptr<Interpolate> interp;
   };
   
 
@@ -35,8 +35,11 @@ namespace Ionization {
   class IonizationModel {
   public:
     IonizationModel(double density_of_neutrals, double ionizing_fraction, double pressure,
-                    Rate& rate);
+                    Rate& rate, int Nradius, int Ntime);
     void calculate_electron_density(const Radial& electric_field, Array2D<double>& electron_density);
+
+    // for performance, to only calculate the rate once per step
+    Array2D<double> cached_rate;
 
   private:
     double density_of_neutrals, ionizing_fraction;
