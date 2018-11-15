@@ -2,6 +2,7 @@
 #include "propagator.h"
 #include "driver.h"
 #include "gaussian.h"
+#include "fromfile.h"
 #include "constants.h"
 #include "medium.h"
 #include "linear.h"
@@ -53,17 +54,28 @@ int main(int argc, char* argv[]) {
 		    abserr, relerr, first_step);
     
     // input field
-    double length = p.get<double>("laser/length");
-    double waist = p.get<double>("laser/waist");
+    std::string laser_type = p.get<std::string>("laser/type");
     double wavelength = p.get<double>("laser/wavelength");
-    double focus = p.get<double>("laser/focus");
-    double energy = p.get<double>("laser/energy");
-    double phase_deg = p.get<double>("laser/phase_deg");
-    double delay = p.get<double>("laser/delay");
-    double phase = phase_deg / 180.0 * Constants::pi;
+    if (laser_type == "gaussian") {
+      double length = p.get<double>("laser/length");
+      double waist = p.get<double>("laser/waist");
+      double focus = p.get<double>("laser/focus");
+      double energy = p.get<double>("laser/energy");
+      double phase_deg = p.get<double>("laser/phase_deg");
+      double delay = p.get<double>("laser/delay");
+      double phase = phase_deg / 180.0 * Constants::pi;
+      Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy);
+      prop.initialize_field(laser_field);
+    }
+    else if (laser_type == "file") {
+      std::string filename = p.get<std::string>("laser/filename");
+      Field::FromFile laser_field(filename, prop.field.radius, prop.field.time);
+      prop.initialize_field(laser_field);
+    }
+    else {
+      throw std::runtime_error("Unsupported laser/type: " + laser_type);
+    }
 
-    Field::Gaussian gauss(wavelength, waist, focus, length, phase, delay, energy);
-    prop.initialize_field(gauss);
     
     std::string medium_name = p.get<std::string>("medium/medium");
     double pressure = p.get<double>("medium/pressure");
@@ -81,11 +93,11 @@ int main(int argc, char* argv[]) {
     if (sim_type == "capillary") {
       double radius = p.get<double>("capillary/radius");
       double cladding = p.get<double>("capillary/cladding");
-      auto linear = Capillary(index, radius, cladding, pressure);
+      Capillary linear(index, radius, cladding, pressure);
       prop.initialize_linear(linear, omega0);
     }
     else if (sim_type == "freespace") {
-      auto linear = FreeSpace(index);
+      FreeSpace linear(index);
       prop.initialize_linear(linear, omega0);
     }
 
