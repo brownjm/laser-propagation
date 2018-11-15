@@ -25,6 +25,8 @@ public:
   std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
   void initialize_field(const Field::Field& field);
+  void restart_from(const std::string& Efield_filename, const std::string& Afield_filename,
+                    const std::string& Rho_filename);
 
   void initialize_filters(double time_filter_min, double time_filter_max,
                           double wave_filter_min, double wave_filter_max);
@@ -43,7 +45,7 @@ public:
   SimulationData get_data();
   
   Radial field;
-  Array2D<double> Rho;
+  Array2D<double> electron_density;
   
   int Ntime, Nradius, Nomega, Nkperp;
   double vg, n2, fraction, scaling, pressure;

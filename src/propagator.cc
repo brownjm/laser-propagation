@@ -14,7 +14,7 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
 		       int Nr, double R, int Nk,
 		       double abs_err, double rel_err, double first_step)
   :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
-   Rho(Nr, Nt),
+   electron_density(Nr, Nt),
    Ntime(Nt), Nradius(Nr), vg(0),
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
@@ -47,9 +47,9 @@ std::string Propagator::log_grid_info() {
   std::stringstream ss;
   ss << "*** Computational Grid ***\n";
   ss << "Supported Wavelengths: (" << wave_min << ", " << wave_max << ")\n";
-  ss << "Ntime    =  " << Ntime << "\n";
+  ss << "Ntime    = " << Ntime << "\n";
   ss << "Nomega   = " << Nomega << "\n";
-  ss << "Nradius  =  " << Nradius << "\n";
+  ss << "Nradius  = " << Nradius << "\n";
   ss << "Nkperp   = " << Nkperp << "\n";
 
   // ode solver
@@ -97,7 +97,39 @@ void Propagator::initialize_field(const Field::Field& Efield) {
     }
   }
 
-  field.transform_to_temporal();
+  //field.transform_to_temporal();
+}
+
+void Propagator::restart_from(const std::string& temporal_filename,
+                              const std::string& spectral_filename,
+                              const std::string& density_filename) {
+  std::vector<std::complex<double>> temporal;
+  IO::read_binary(temporal_filename, temporal);
+  if (temporal.size() == field.temporal.values.size()) {
+    field.temporal.values = temporal;
+  }
+  else {
+    throw std::runtime_error("Temporal field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nradius*Ntime) + ", received " + std::to_string(temporal.size()));
+  }
+  
+  std::vector<std::complex<double>> spectral;
+  IO::read_binary(spectral_filename, spectral);
+  if (spectral.size() == field.spectral.values.size()) {
+    field.spectral.values = spectral;
+  }
+  else {
+    throw std::runtime_error("Spectral field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nkperp*Nomega) + ", received " + std::to_string(spectral.size()));
+  }
+
+  std::vector<double> density;
+  IO::read_binary(density_filename, density);
+  if (density.size() == field.spectral.values.size()) {
+    electron_density.values = density;
+  }
+  else {
+    throw std::runtime_error("Spectral field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nradius*Ntime) + ", received " + std::to_string(density.size()));
+  }
+  
 }
 
 void Propagator::initialize_filters(double time_filter_min, double time_filter_max,
@@ -167,7 +199,7 @@ void Propagator::nonlinear_step(double& z, double zi) {
 
 void Propagator::calculate_electron_density() {
   if (ionization) {
-    ionization->calculate_electron_density(field, Rho);
+    ionization->calculate_electron_density(field, electron_density);
   }
 }
 
@@ -186,7 +218,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   for (; source_iter != std::end(polarization_responses); ++source_iter, ++workspace_iter) {
     Radial& workspace = **workspace_iter;
     NonlinearResponse& source = **source_iter;
-    source.calculate_temporal_response(field, Rho, workspace);
+    source.calculate_temporal_response(field, electron_density, workspace);
     workspace.transform_to_spectral();
     linear_step(workspace, -z);
     source.finalize_spectral_response(workspace);
@@ -204,7 +236,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   for (; source_iter != std::end(current_responses); ++source_iter, ++workspace_iter) {
     Radial& workspace = **workspace_iter;
     NonlinearResponse& source = **source_iter;
-    source.calculate_temporal_response(field, Rho, workspace);
+    source.calculate_temporal_response(field, electron_density, workspace);
     workspace.transform_to_spectral();
     linear_step(workspace, -z);
     source.finalize_spectral_response(workspace);
@@ -219,7 +251,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
 
 
 SimulationData Propagator::get_data() {
-  SimulationData data = {field, Rho};
+  SimulationData data = {field, electron_density};
   return data;
 }
 
