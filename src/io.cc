@@ -16,7 +16,7 @@ void IO::read(const std::string& filename, std::vector<double>& x, std::vector<d
 
 void IO::write(const std::string& filename, const std::vector<double>& data) {
   std::ofstream output(filename);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output.precision(std::numeric_limits<double>::digits10+1);
   output << std::scientific;
   for (auto& v: data) {
@@ -28,7 +28,7 @@ void IO::write(const std::string& filename, const std::vector<double>& data) {
 void IO::write(const std::string& filename, const std::vector<std::complex<double>>& data,
 	       int Nrows, int Ncols) {
   std::ofstream output(filename);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output.precision(std::numeric_limits<double>::digits10+1);
   output << std::scientific;
   for (int r = 0; r < Nrows; ++r) {
@@ -39,21 +39,38 @@ void IO::write(const std::string& filename, const std::vector<std::complex<doubl
   }
 }
 
+void IO::read_binary(const std::string& filename, std::vector<double>& data) {
+  std::ifstream input(filename, std::ios::in | std::ios::binary);
+  if (!input) throw std::runtime_error("Cannot open input file: " + filename);
+  double value;
+  while (input.read(reinterpret_cast<char*>(&value), sizeof(double))) {
+    data.push_back(value);
+  }
+}
 
 void IO::write_binary(const std::string& filename, const std::vector<double>& data) {
   std::ofstream output(filename, std::ios::out | std::ios::binary);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output.write(reinterpret_cast<const char*>(data.data()),
 	       data.size()*sizeof(double));
 }
 
+void IO::read_binary(const std::string& filename, std::vector<std::complex<double>>& data) {
+  std::ifstream input(filename, std::ios::in | std::ios::binary);
+  if (!input) throw std::runtime_error("Cannot open input file: " + filename);
+  std::complex<double> value;
+  while (input.read(reinterpret_cast<char*>(&value), sizeof(std::complex<double>))) {
+    data.push_back(value);
+  }
+}
 
 void IO::write_binary(const std::string& filename, const std::vector<std::complex<double>>& data) {
   std::ofstream output(filename, std::ios::out | std::ios::binary);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output.write(reinterpret_cast<const char*>(data.data()),
 	       data.size()*sizeof(std::complex<double>));
 }
+
 
 std::string IO::enumerate_filename(const std::string& name, int i) {
   std::ostringstream oss;
@@ -67,7 +84,7 @@ void IO::clear_contents(const std::string& filename) {
 
 void IO::write_append(const std::string& filename, double value) {
   std::ofstream output(filename, std::ios::out | std::ios::app);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output.precision(std::numeric_limits<double>::digits10+1);
   output << std::scientific;
   output << value << "\n";
@@ -75,6 +92,6 @@ void IO::write_append(const std::string& filename, double value) {
 
 void IO::write_append(const std::string& filename, const std::string& text) {
   std::ofstream output(filename, std::ios::out | std::ios::app);
-  if(!output) throw std::runtime_error("Cannot open output file: " + filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
   output << text;
 }
