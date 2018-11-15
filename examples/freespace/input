@@ -22,6 +22,7 @@ relerr = 0
 first_step = 1e-3
 
 [laser]
+type = gaussian
 length = 9e-15
 waist = 6e-3
 wavelength = 1.7e-6
