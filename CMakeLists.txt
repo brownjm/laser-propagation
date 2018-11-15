@@ -11,6 +11,7 @@ add_executable(main.out
   src/radial.cc
   src/io.cc
   src/gaussian.cc
+  src/fromfile.cc
   src/parameters.cc
   src/ionization.cc
   src/interpolate.cc
