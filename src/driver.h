@@ -13,11 +13,11 @@ class Driver {
 public:
   Driver(Propagator& propagator);
   void add_observer(std::unique_ptr<Observers::Observer> obs);
-  void run(double distance, int steps);
+  void run(double start_distance, double end_distance, int steps);
 
 private:
   int current_step;
-  double current_distance;
+  double solver_distance, physical_distance;
   
   Propagator& propagator;
 
