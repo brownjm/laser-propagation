@@ -19,6 +19,7 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
    A(field.Nkperp, field.Nomega),
+   nonlinear_workspace(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    abserr(abs_err), relerr(rel_err), first_step(first_step) {
 
 
@@ -126,31 +127,23 @@ void Propagator::initialize_filters(double time_filter_min, double time_filter_m
 
   field.initialize_temporal_filter(time_filter_min, time_filter_max);
   field.initialize_spectral_filter(wave_filter_min, wave_filter_max);
-  
-  for (auto& r : polarization_workspaces) {
-    r->initialize_temporal_filter(time_filter_min, time_filter_max);
-    r->initialize_spectral_filter(wave_filter_min, wave_filter_max);
-  }
-
-  for (auto& r : current_workspaces) {
-    r->initialize_temporal_filter(time_filter_min, time_filter_max);
-    r->initialize_spectral_filter(wave_filter_min, wave_filter_max);
-  }
+  nonlinear_workspace.initialize_temporal_filter(time_filter_min, time_filter_max);
+  nonlinear_workspace.initialize_spectral_filter(wave_filter_min, wave_filter_max);
 }
 
 
 void Propagator::add_polarization(std::unique_ptr<NonlinearResponse> polarization) {
   polarization_responses.push_back(std::move(polarization));
-  polarization_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
-                                                             field.wavelength_min, field.wavelength_max,
-                                                             field.Nradius, field.Rmax, field.Nkperp));
+  // polarization_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
+  //                                                            field.wavelength_min, field.wavelength_max,
+  //                                                            field.Nradius, field.Rmax, field.Nkperp));
 }
 
 void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
   current_responses.push_back(std::move(current));
-  current_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
-                                                        field.wavelength_min, field.wavelength_max,
-                                                        field.Nradius, field.Rmax, field.Nkperp));
+  // current_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
+  //                                                       field.wavelength_min, field.wavelength_max,
+  //                                                       field.Nradius, field.Rmax, field.Nkperp));
 }
 
 void Propagator::add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz) {
@@ -192,46 +185,39 @@ void Propagator::calculate_electron_density() {
 }
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
+  std::fill(dA, dA + Nkperp*Nomega, 0);
+  
   // 1: shift to current z
   linear_step(A, field, z);
 
   // 2: transform A to E
   field.transform_to_temporal();
+  calculate_electron_density();
 
   // 3: calculate nonlinearities
-  calculate_electron_density();
-  std::fill(dA, dA + Nkperp*Nomega, 0);
-  auto source_iter = std::begin(polarization_responses);
-  auto workspace_iter = std::begin(polarization_workspaces);
-  for (; source_iter != std::end(polarization_responses); ++source_iter, ++workspace_iter) {
-    Radial& workspace = **workspace_iter;
-    NonlinearResponse& source = **source_iter;
-    source.calculate_temporal_response(field, electron_density, workspace);
-    workspace.transform_to_spectral();
-    linear_step(workspace, -z);
-    source.finalize_spectral_response(workspace);
+  for (auto& source : polarization_responses) {
+    source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
+    nonlinear_workspace.transform_to_spectral();
+    linear_step(nonlinear_workspace, -z);
+    source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {
-        dA[i*Nomega + j] += coef(i, j) * workspace.kw(i, j);
+        dA[i*Nomega + j] += coef(i, j) * nonlinear_workspace.kw(i, j);
       }
     }
   }
 
 
   std::complex<double> imagi(0, 1);
-  source_iter = std::begin(current_responses);
-  workspace_iter = std::begin(current_workspaces);
-  for (; source_iter != std::end(current_responses); ++source_iter, ++workspace_iter) {
-    Radial& workspace = **workspace_iter;
-    NonlinearResponse& source = **source_iter;
-    source.calculate_temporal_response(field, electron_density, workspace);
-    workspace.transform_to_spectral();
-    linear_step(workspace, -z);
-    source.finalize_spectral_response(workspace);
+  for (auto& source : current_responses) {
+    source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
+    nonlinear_workspace.transform_to_spectral();
+    linear_step(nonlinear_workspace, -z);
+    source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {
         const double omega = field.omega[j];
-        dA[i*Nomega + j] += coef(i, j) * imagi / omega * workspace.kw(i, j);
+        dA[i*Nomega + j] += coef(i, j) * imagi / omega * nonlinear_workspace.kw(i, j);
       }
     }
   }
