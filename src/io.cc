@@ -43,7 +43,7 @@ void IO::read_binary(const std::string& filename, std::vector<double>& data) {
   std::ifstream input(filename, std::ios::in | std::ios::binary);
   if (!input) throw std::runtime_error("Cannot open input file: " + filename);
   double value;
-  while (input.read(reinterpret_cast<char*>(&value), sizeof(double))) {
+  while (input.read(reinterpret_cast<char*>(&value), sizeof(value))) {
     data.push_back(value);
   }
 }
@@ -59,7 +59,7 @@ void IO::read_binary(const std::string& filename, std::vector<std::complex<doubl
   std::ifstream input(filename, std::ios::in | std::ios::binary);
   if (!input) throw std::runtime_error("Cannot open input file: " + filename);
   std::complex<double> value;
-  while (input.read(reinterpret_cast<char*>(&value), sizeof(std::complex<double>))) {
+  while (input.read(reinterpret_cast<char*>(&value), sizeof(value))) {
     data.push_back(value);
   }
 }

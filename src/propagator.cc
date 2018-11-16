@@ -123,8 +123,6 @@ void Propagator::restart_from(const std::string& spectral_filename) {
 
 void Propagator::initialize_filters(double time_filter_min, double time_filter_max,
                                     double wave_filter_min, double wave_filter_max) {
-
-
   field.initialize_temporal_filter(time_filter_min, time_filter_max);
   field.initialize_spectral_filter(wave_filter_min, wave_filter_max);
   nonlinear_workspace.initialize_temporal_filter(time_filter_min, time_filter_max);
@@ -134,16 +132,10 @@ void Propagator::initialize_filters(double time_filter_min, double time_filter_m
 
 void Propagator::add_polarization(std::unique_ptr<NonlinearResponse> polarization) {
   polarization_responses.push_back(std::move(polarization));
-  // polarization_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
-  //                                                            field.wavelength_min, field.wavelength_max,
-  //                                                            field.Nradius, field.Rmax, field.Nkperp));
 }
 
 void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
   current_responses.push_back(std::move(current));
-  // current_workspaces.push_back(std::make_unique<Radial>(field.Ntime, field.time_min, field.time_max,
-  //                                                       field.wavelength_min, field.wavelength_max,
-  //                                                       field.Nradius, field.Rmax, field.Nkperp));
 }
 
 void Propagator::add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz) {
@@ -152,8 +144,8 @@ void Propagator::add_ionization(std::shared_ptr<Ionization::IonizationModel> ion
 
 void Propagator::linear_step(Radial& radial, double dz) {
   std::complex<double> imagi(0, 1);
-  for (int i = 0; i < radial.Nkperp; ++i) {
-    for (int j = 0; j < radial.Nomega; ++j) {
+  for (int i = 0; i < Nkperp; ++i) {
+    for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
       radial.kw(i, j) *= std::exp(-imagi * arg * dz);
     }
@@ -162,10 +154,10 @@ void Propagator::linear_step(Radial& radial, double dz) {
 
 void Propagator::linear_step(const std::complex<double>* A, Radial& radial, double dz) {
   std::complex<double> imagi(0, 1);
-  for (int i = 0; i < radial.Nkperp; ++i) {
-    for (int j = 0; j < radial.Nomega; ++j) {
+  for (int i = 0; i < Nkperp; ++i) {
+    for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
-      radial.kw(i, j) = A[i*radial.Nomega + j] * std::exp(-imagi * arg * dz);
+      radial.kw(i, j) = A[i*Nomega + j] * std::exp(-imagi * arg * dz);
     }
   }
 }
