@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
 
     // check which simulation is requested
     std::string sim_type = p.get<std::string>("simulation/type");
+
     
     // coordinates
     int Ntime = p.get<int>("time/N");
@@ -52,28 +53,40 @@ int main(int argc, char* argv[]) {
     Propagator prop(Ntime, time_min, time_max, wave_min, wave_max,
 		    Nradius, R, Nkperp,
 		    abserr, relerr, first_step);
-    
-    // input field
-    std::string laser_type = p.get<std::string>("laser/type");
+
+
+    // check if this is a new simulation or a restart from a set of files
+    std::string restart = p.get<std::string>("simulation/starting_mode");
     double wavelength = p.get<double>("laser/wavelength");
-    if (laser_type == "gaussian") {
-      double length = p.get<double>("laser/length");
-      double waist = p.get<double>("laser/waist");
-      double focus = p.get<double>("laser/focus");
-      double energy = p.get<double>("laser/energy");
-      double phase_deg = p.get<double>("laser/phase_deg");
-      double delay = p.get<double>("laser/delay");
-      double phase = phase_deg / 180.0 * Constants::pi;
-      Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy);
-      prop.initialize_field(laser_field);
+    if (restart == "new") {
+      // input field
+      std::string laser_type = p.get<std::string>("laser/type");
+      if (laser_type == "gaussian") {
+	double length = p.get<double>("laser/length");
+	double waist = p.get<double>("laser/waist");
+	double focus = p.get<double>("laser/focus");
+	double energy = p.get<double>("laser/energy");
+	double phase_deg = p.get<double>("laser/phase_deg");
+	double delay = p.get<double>("laser/delay");
+	double phase = phase_deg / 180.0 * Constants::pi;
+	Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy);
+	prop.initialize_field(laser_field);
+      }
+      else if (laser_type == "file") {
+	std::string filename = p.get<std::string>("laser/filename");
+	Field::FromFile laser_field(filename, prop.field.radius, prop.field.time);
+	prop.initialize_field(laser_field);
+      }
+      else {
+	throw std::runtime_error("Unsupported laser/type: " + laser_type);
+      }
     }
-    else if (laser_type == "file") {
-      std::string filename = p.get<std::string>("laser/filename");
-      Field::FromFile laser_field(filename, prop.field.radius, prop.field.time);
-      prop.initialize_field(laser_field);
+    else if (restart == "resume") {
+      std::string spectral_file = p.get<std::string>("simulation/spectral_file");
+      prop.restart_from(spectral_file);
     }
     else {
-      throw std::runtime_error("Unsupported laser/type: " + laser_type);
+      throw std::runtime_error("Unsupported simulation/starting_mode: " + restart);
     }
 
     
@@ -148,16 +161,16 @@ int main(int argc, char* argv[]) {
     driver.add_observer(std::make_unique<Observers::MaxDensity>(fn_maxdensity));
 
     
-
-    double z = p.get<double>("propagation/z");
+    double start_distance = p.get<double>("propagation/start_distance");
+    double end_distance = p.get<double>("propagation/end_distance");
     int steps = p.get<int>("propagation/steps");
 
     std::stringstream ss;
-    p.print(ss);
+    //p.print(ss);
     IO::clear_contents("log");
     IO::write_append("log", ss.str());
     std::cout << ss.str();
-    driver.run(z, steps);
+    driver.run(start_distance, end_distance, steps);
   }
   catch (std::exception& err) {
     std::cerr << err.what() << "\n";

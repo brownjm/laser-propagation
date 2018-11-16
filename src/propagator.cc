@@ -19,7 +19,7 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
    A(field.Nkperp, field.Nomega),
-   z(0), abserr(abs_err), relerr(rel_err), first_step(first_step) {
+   abserr(abs_err), relerr(rel_err), first_step(first_step) {
 
 
   Nomega = field.Nomega;
@@ -97,21 +97,10 @@ void Propagator::initialize_field(const Field::Field& Efield) {
     }
   }
 
-  //field.transform_to_temporal();
+  field.transform_to_temporal();
 }
 
-void Propagator::restart_from(const std::string& temporal_filename,
-                              const std::string& spectral_filename,
-                              const std::string& density_filename) {
-  std::vector<std::complex<double>> temporal;
-  IO::read_binary(temporal_filename, temporal);
-  if (temporal.size() == field.temporal.values.size()) {
-    field.temporal.values = temporal;
-  }
-  else {
-    throw std::runtime_error("Temporal field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nradius*Ntime) + ", received " + std::to_string(temporal.size()));
-  }
-  
+void Propagator::restart_from(const std::string& spectral_filename) {
   std::vector<std::complex<double>> spectral;
   IO::read_binary(spectral_filename, spectral);
   if (spectral.size() == field.spectral.values.size()) {
@@ -120,16 +109,15 @@ void Propagator::restart_from(const std::string& temporal_filename,
   else {
     throw std::runtime_error("Spectral field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nkperp*Nomega) + ", received " + std::to_string(spectral.size()));
   }
-
-  std::vector<double> density;
-  IO::read_binary(density_filename, density);
-  if (density.size() == field.spectral.values.size()) {
-    electron_density.values = density;
-  }
-  else {
-    throw std::runtime_error("Spectral field file dimensions do not match the current simulation parameters. Expected a length of " + std::to_string(Nradius*Ntime) + ", received " + std::to_string(density.size()));
-  }
   
+  // copy spectral field to auxillary A which is passed to ODE solver
+  for (int i = 0; i < Nkperp; ++i) {
+    for (int j = 0; j < Nomega; ++j) {
+      A(i, j) = field.kw(i, j);
+    }
+  }
+
+  field.transform_to_temporal();
 }
 
 void Propagator::initialize_filters(double time_filter_min, double time_filter_max,

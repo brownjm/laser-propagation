@@ -25,8 +25,7 @@ public:
   std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
   void initialize_field(const Field::Field& field);
-  void restart_from(const std::string& Efield_filename, const std::string& Afield_filename,
-                    const std::string& Rho_filename);
+  void restart_from(const std::string& spectral_filename);
 
   void initialize_filters(double time_filter_min, double time_filter_max,
                           double wave_filter_min, double wave_filter_max);
@@ -58,7 +57,7 @@ public:
   std::shared_ptr<Ionization::IonizationModel> ionization;
   
   // ode solver
-  double z, abserr, relerr, first_step;
+  double abserr, relerr, first_step;
   gsl_odeiv2_system system;
   gsl_odeiv2_driver* driver;
 };
