@@ -17,7 +17,7 @@ void IO::read(const std::string& filename, std::vector<double>& x, std::vector<d
 void IO::write(const std::string& filename, const std::vector<double>& data) {
   std::ofstream output(filename);
   if (!output) throw std::runtime_error("Cannot open output file: " + filename);
-  output.precision(std::numeric_limits<double>::digits10+1);
+  output.precision(std::numeric_limits<double>::max_digits10);
   output << std::scientific;
   for (auto& v: data) {
     output << v << "\n";
@@ -29,7 +29,7 @@ void IO::write(const std::string& filename, const std::vector<std::complex<doubl
 	       int Nrows, int Ncols) {
   std::ofstream output(filename);
   if (!output) throw std::runtime_error("Cannot open output file: " + filename);
-  output.precision(std::numeric_limits<double>::digits10+1);
+  output.precision(std::numeric_limits<double>::max_digits10);
   output << std::scientific;
   for (int r = 0; r < Nrows; ++r) {
     for (int c = 0; c < Ncols; ++c) {
@@ -85,7 +85,7 @@ void IO::clear_contents(const std::string& filename) {
 void IO::write_append(const std::string& filename, double value) {
   std::ofstream output(filename, std::ios::out | std::ios::app);
   if (!output) throw std::runtime_error("Cannot open output file: " + filename);
-  output.precision(std::numeric_limits<double>::digits10+1);
+  output.precision(std::numeric_limits<double>::max_digits10);
   output << std::scientific;
   output << value << "\n";
 }
