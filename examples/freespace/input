@@ -1,5 +1,12 @@
 [simulation]
 type = freespace
+starting_mode = new
+spectral_file = A000.dat
+
+[propagation]
+start_distance = 0
+end_distance = 4
+steps = 4
 
 [time]
 N = 1024
@@ -40,9 +47,6 @@ density_of_neutrals = 2.5e25
 n2 = 8e-24
 pressure = 1
 
-[propagation]
-z = 4
-steps = 16
 
 [output]
 temporal_field = E

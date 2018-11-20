@@ -1,5 +1,12 @@
 [simulation]
 type = capillary
+starting_mode = new
+spectral_file = A000.dat
+
+[propagation]
+start_distance = 0
+end_distance = 1
+steps = 4
 
 [time]
 N = 2048
@@ -12,10 +19,14 @@ wave_max = 3000e-9
 wave_filter_min = 250e-9
 wave_filter_max = 1500e-9
 
-
 [space]
 N = 50
 R = 250e-6
+
+[capillary]
+radius = 250e-6
+cladding = 1.45
+modes = 3
 
 [ode]
 abserr = 1e10
@@ -42,15 +53,6 @@ n2 = 20e-24
 pressure = 3.3
 collision_time = 350e-15
 ionization_potential = 2.5250303e-18
-
-[capillary]
-radius = 250e-6
-cladding = 1.45
-modes = 3
-
-[propagation]
-z = 1
-steps = 4
 
 [output]
 temporal_field = E
