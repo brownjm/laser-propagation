@@ -33,8 +33,6 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
 
   driver = gsl_odeiv2_driver_alloc_y_new(&system, gsl_odeiv2_step_rkf45, first_step,
   					 abserr, relerr);
-
-  
 }
 
 Propagator::~Propagator() {
@@ -164,10 +162,13 @@ void Propagator::linear_step(const std::complex<double>* A, Radial& radial, doub
 
 void Propagator::nonlinear_step(double& z, double zi) {
   int status = gsl_odeiv2_driver_apply(driver, &z, zi,
-				       reinterpret_cast<double*>(A.get_data_ptr()));
+        			       reinterpret_cast<double*>(A.get_data_ptr()));
   if (status != GSL_SUCCESS) {
     throw std::runtime_error("gsl_ode error: " + std::to_string(status));
   }
+  linear_step(A.get_data_ptr(), field, z);
+  field.transform_to_temporal();
+  calculate_electron_density();
 }
 
 void Propagator::calculate_electron_density() {
