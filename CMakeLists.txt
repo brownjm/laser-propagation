@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.4)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GSL REQUIRED)
 find_package(FFTW REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_executable(main.out
   src/main.cc
@@ -27,5 +28,5 @@ add_executable(main.out
   src/electron_density.cc
   )
 
-target_compile_options(main.out PUBLIC -Ofast -Wall -Wextra -pedantic -DHAVE_INLINE)
-target_link_libraries(main.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES})
+target_compile_options(main.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
+target_link_libraries(main.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES} Eigen3::Eigen)
