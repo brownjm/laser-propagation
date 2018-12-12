@@ -166,10 +166,12 @@ int main(int argc, char* argv[]) {
     int steps = p.get<int>("propagation/steps");
 
     std::stringstream ss;
-    //p.print(ss);
+    p.print(ss);
+    ss << prop.log_grid_info();
     IO::clear_contents("log");
     IO::write_append("log", ss.str());
     std::cout << ss.str();
+
     driver.run(start_distance, end_distance, steps);
   }
   catch (std::exception& err) {
