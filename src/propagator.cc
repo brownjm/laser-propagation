@@ -87,7 +87,8 @@ void Propagator::initialize_field(const Field::Field& Efield) {
   }
   
   // fill spectral array with initialized field
-  field.transform_to_spectral();
+  // field.transform_to_spectral();
+  field.transform_to_spectral_eigen();
 
   // copy spectral field to auxillary A which is passed to ODE solver
   for (int i = 0; i < Nkperp; ++i) {
@@ -96,7 +97,8 @@ void Propagator::initialize_field(const Field::Field& Efield) {
     }
   }
 
-  field.transform_to_temporal();
+  // field.transform_to_temporal();
+  field.transform_to_temporal_eigen();
 }
 
 void Propagator::restart_from(const std::string& spectral_filename) {
@@ -116,7 +118,8 @@ void Propagator::restart_from(const std::string& spectral_filename) {
     }
   }
 
-  field.transform_to_temporal();
+  // field.transform_to_temporal();
+  field.transform_to_temporal_eigen();
 }
 
 void Propagator::initialize_filters(double time_filter_min, double time_filter_max,
@@ -167,7 +170,8 @@ void Propagator::nonlinear_step(double& z, double zi) {
     throw std::runtime_error("gsl_ode error: " + std::to_string(status));
   }
   linear_step(A.get_data_ptr(), field, z);
-  field.transform_to_temporal();
+  // field.transform_to_temporal();
+  field.transform_to_temporal_eigen();
   calculate_electron_density();
 }
 
@@ -184,13 +188,15 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   linear_step(A, field, z);
 
   // 2: transform A to E
-  field.transform_to_temporal();
+  // field.transform_to_temporal();
+  field.transform_to_temporal_eigen();
   calculate_electron_density();
 
   // 3: calculate nonlinearities
   for (auto& source : polarization_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
-    nonlinear_workspace.transform_to_spectral();
+    //nonlinear_workspace.transform_to_spectral();
+    nonlinear_workspace.transform_to_spectral_eigen();
     linear_step(nonlinear_workspace, -z);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
@@ -204,7 +210,8 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   std::complex<double> imagi(0, 1);
   for (auto& source : current_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
-    nonlinear_workspace.transform_to_spectral();
+    // nonlinear_workspace.transform_to_spectral();
+    nonlinear_workspace.transform_to_spectral_eigen();
     linear_step(nonlinear_workspace, -z);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {

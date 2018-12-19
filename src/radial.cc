@@ -5,6 +5,10 @@
 #include "io.h"
 #include <iostream>
 
+#include <Eigen/Dense>
+
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Md;
+typedef Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Mcd;
 
 
 Radial::Radial(int Nt, double time_min, double time_max,
@@ -232,5 +236,41 @@ void Radial::transform_to_temporal() {
   }
 }
 
+void Radial::transform_to_spectral_eigen() {
+  // Perform Fourier transform on each temporal row
+  // Copy active frequencies from Aux_fft -> Aux_hankel
+  for (int i = 0; i < Nradius; ++i) {
+    std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
+    std::copy_n(std::begin(temporal.values) + i*Ntime, Ntime, std::begin(Aux_fft));
+    apply_temporal_filter();    
+    fftw_execute(forward_plan);
+    apply_spectral_filter();
+    std::copy_n(std::begin(Aux_fft)+index_minimum_frequency,
+		Nomega, std::begin(Aux_hankel.values) + i*Nomega);
+  }
 
+  Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
+  Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
+  Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
+  spectral2 = dht2.block(0, 0, Nkperp, Nradius) * Aux_hankel2;
+}
 
+void Radial::transform_to_temporal_eigen() {
+  Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
+  Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
+  Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
+  Aux_hankel2 = (spectral2.transpose() * dht2.block(0, 0, Nradius, Nkperp).transpose()).transpose();
+
+  // Perform inverse fourier transform on each row
+  // copy data from Aux_fft -> temporal
+  for (int i = 0; i < Nradius; ++i) {
+    std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
+    std::copy_n(std::begin(Aux_hankel.values) + i*Nomega, Nomega,
+		std::begin(Aux_fft) + index_minimum_frequency);
+    apply_spectral_filter();
+    fftw_execute(forward_plan);
+    apply_temporal_filter();
+    for (auto& a : Aux_fft) { a /= Ntime; }
+    std::copy_n(std::begin(Aux_fft), Ntime, std::begin(temporal.values)+i*Ntime);
+  }
+}
