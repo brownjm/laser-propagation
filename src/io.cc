@@ -24,6 +24,19 @@ void IO::write(const std::string& filename, const std::vector<double>& data) {
   }
 }
 
+void IO::write(const std::string& filename, const std::vector<double>& data,
+               int Nrows, int Ncols) {
+  std::ofstream output(filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
+  output.precision(std::numeric_limits<double>::max_digits10);
+  output << std::scientific;
+  for (int r = 0; r < Nrows; ++r) {
+    for (int c = 0; c < Ncols; ++c) {
+      output << data[r*Ncols + c] << " ";
+    }
+    output << "\n";
+  }
+}
 
 void IO::write(const std::string& filename, const std::vector<std::complex<double>>& data,
 	       int Nrows, int Ncols) {

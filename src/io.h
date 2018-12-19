@@ -9,6 +9,8 @@ namespace IO {
   void read(const std::string& filename, std::vector<double>& x, std::vector<double>& y);
   
   void write(const std::string& filename, const std::vector<double>& data);
+  void write(const std::string& filename, const std::vector<double>& data,
+	     int Nrows, int Ncols);
   void write(const std::string& filename, const std::vector<std::complex<double>>& data,
 	     int Nrows, int Ncols);
   void read_binary(const std::string& filename, std::vector<double>& data);

@@ -155,7 +155,7 @@ void Radial::initialize_radial_domain() {
       dht(i, j) = 2.0 * J0 / (J1*J1*S);
     }
   }
-  IO::write("hankel.dat", dht.vec());
+  IO::write("hankel.dat", dht.vec(), Nradius, Nradius);
 }
 
 
