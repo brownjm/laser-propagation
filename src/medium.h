@@ -15,6 +15,9 @@ namespace Medium {
   
   // index of argon at 15 C, 1 atm
   double index_argon(double omega);
+
+  // index of ethanol at 15 C
+  double index_ethanol(double omega);
   
   const std::function<double(double)> select_linear_index(const std::string& name);
 
