@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <complex>
+#include <iostream>
 
 #include "medium.h"
 
@@ -21,7 +22,7 @@ public:
     return vg;
   }
 
-protected:
+
   std::function<double(double)> n;
 };
 
@@ -33,7 +34,15 @@ public:
   
   std::complex<double> kz(double kperp, double omega) const override {
     double k = n(omega) * omega / Constants::c;
-    return std::sqrt(std::pow(k, 2) - std::pow(kperp, 2));
+    double k2 = std::pow(k, 2);
+    double kperp2 = std::pow(kperp, 2);
+    if (kperp2 > k2) {
+      return 0.0;
+    }
+    else {
+      double kzvalue = std::sqrt(std::pow(k, 2) - std::pow(kperp, 2));
+      return kzvalue;
+    }
   }
 };
 

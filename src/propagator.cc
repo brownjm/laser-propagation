@@ -57,12 +57,21 @@ std::string Propagator::log_grid_info() {
 }
 
 void Propagator::initialize_linear(const Linear& linear, double omega0) {
+  std::vector<double> index;
+  for (int j = 0; j < Nomega; ++j) {
+    index.push_back(linear.n(field.omega[j]));
+  }
+  IO::write("index.dat", index);
+  
   std::complex<double> imagi(0, 1);
   for (int i = 0; i < Nkperp; ++i) {
     double kperp = field.kperp[i];
     for (int j = 0; j < Nomega; ++j) {
       double omega = field.omega[j];
       kz(i, j) = linear.kz(kperp, omega);
+      if (std::isnan(kz(i, j).real())) {
+        std::cout << omega << " " << kperp << "\n";
+      }
     }
   }
   vg = linear.group_velocity(field.kperp[0], omega0);
@@ -70,7 +79,13 @@ void Propagator::initialize_linear(const Linear& linear, double omega0) {
   // nonlinear coupling coefficient
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
-      coef(i, j) = imagi / (2*Constants::epsilon_0*kz(i, j).real()) * std::pow(field.omega[j]/Constants::c, 2);
+      double kzvalue = kz(i, j).real();
+      if (kzvalue > 0.0) {
+        coef(i, j) = imagi / (2*Constants::epsilon_0*kz(i, j).real()) * std::pow(field.omega[j]/Constants::c, 2);
+      }
+      else {
+        coef(i, j) = 0.0;
+      }
     }
   }
 
