@@ -25,9 +25,6 @@ public:
   void transform_to_spectral();
   void transform_to_temporal();
 
-  void transform_to_spectral_eigen();
-  void transform_to_temporal_eigen();
-
   // convenient access functions
   inline std::complex<double> rt(int i, int j) const {
     return temporal(i, j);
