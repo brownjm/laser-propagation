@@ -13,11 +13,11 @@ namespace Field {
     // waist is spatial 1/e^2 radius, duration is full width half maximum (FWHM)
     // focus is positive for converging beams
     Gaussian(double wavelength, double waist, double focus, double duration, 
-	     double phase, double delay, double energy);
+	     double phase, double delay, double energy, double chirp=0);
     std::complex<double> operator()(double radius, double time) const override;
     
   private:
-    double wavelength, waist, focus, tau, phase, delay, energy, k0, omega0, zr, df;
+    double wavelength, waist, focus, tau, phase, delay, energy, chirp, k0, omega0, zr, df;
     
     double radius(double z) const;
     double curvature(double z) const;

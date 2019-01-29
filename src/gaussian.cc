@@ -5,10 +5,10 @@
 namespace Field {
 
   Gaussian::Gaussian(double wavelength, double waist, double focus, double length,
-		     double phase, double delay, double energy)
+		     double phase, double delay, double energy, double chirp)
     :wavelength(wavelength), waist(waist), focus(-focus),
      tau(length*1.699/2), phase(phase),
-     delay(delay), energy(energy) {
+     delay(delay), energy(energy), chirp(chirp) {
     k0 = 2*Constants::pi / wavelength;
     omega0 = k0 * Constants::c;
     zr = k0 * std::pow(waist, 2) / 2;
@@ -60,10 +60,12 @@ namespace Field {
     arg += -i*psi;
     if (focus == 0.0) {
           arg += -std::pow(t/tau, 2);
+          arg += -i*chirp*std::pow(t, 2);
     }
     else {
       double t_shifted = t - std::pow(r, 2) / (2*Constants::c*focus);
       arg += -std::pow(t_shifted/tau, 2);
+      arg += -i*chirp*std::pow(t_shifted, 2);
     }
 
     arg += i*omega0*t;

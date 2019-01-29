@@ -66,10 +66,12 @@ int main(int argc, char* argv[]) {
 	double waist = p.get<double>("laser/waist");
 	double focus = p.get<double>("laser/focus");
 	double energy = p.get<double>("laser/energy");
+        double chirp = p.get<double>("laser/chirp");
 	double phase_deg = p.get<double>("laser/phase_deg");
 	double delay = p.get<double>("laser/delay");
 	double phase = phase_deg / 180.0 * Constants::pi;
-	Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy);
+	Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy,
+                                    chirp);
 	prop.initialize_field(laser_field);
       }
       else if (laser_type == "file") {
