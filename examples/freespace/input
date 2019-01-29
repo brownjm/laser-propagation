@@ -35,6 +35,7 @@ waist = 6e-3
 wavelength = 1.7e-6
 focus = 2
 energy = 1.4e-3
+chirp = 0
 phase_deg = 0
 delay = -50e-15
 
@@ -46,6 +47,8 @@ scaling = 1
 density_of_neutrals = 2.5e25
 n2 = 8e-24
 pressure = 1
+collision_time = 350e-15
+ionization_potential = 1.933779e-18
 
 
 [output]
