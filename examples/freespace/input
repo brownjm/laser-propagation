@@ -9,19 +9,19 @@ end_distance = 4
 steps = 4
 
 [time]
-N = 1024
+N = 2048
 time_min = -100e-15
-time_max = 100e-15
+time_max = 200e-15
 time_filter_min = -90e-15
-time_filter_max = 90e-15
-wave_min = 300e-9
-wave_max = 4e-6
-wave_filter_min = 400e-9
-wave_filter_max = 2500e-9
+time_filter_max = 150e-15
+wave_min = 200e-9
+wave_max = 4000e-6
+wave_filter_min = 250e-9
+wave_filter_max = 3000e-6
 
 [space]
-N = 256
-R = 12e-3
+N = 200
+R = 10e-3
 
 [ode]
 abserr = 1e6
@@ -30,14 +30,14 @@ first_step = 1e-3
 
 [laser]
 type = gaussian
-length = 9e-15
-waist = 6e-3
-wavelength = 1.7e-6
+length = 20e-15
+waist = 4e-3
+wavelength = 1500e-9
 focus = 2
-energy = 1.4e-3
+energy = 1e-3
 chirp = 0
 phase_deg = 0
-delay = -50e-15
+delay = 0
 
 [medium]
 medium = air
