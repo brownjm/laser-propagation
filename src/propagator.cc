@@ -57,11 +57,11 @@ std::string Propagator::log_grid_info() {
 }
 
 void Propagator::initialize_linear(const Linear& linear, double omega0) {
-  std::vector<double> index;
+  std::vector<std::complex<double>> index;
   for (int j = 0; j < Nomega; ++j) {
     index.push_back(linear.n(field.omega[j]));
   }
-  IO::write("index.dat", index);
+  IO::write("index.dat", index, index.size(), 1);
   
   std::complex<double> imagi(0, 1);
   for (int i = 0; i < Nkperp; ++i) {
