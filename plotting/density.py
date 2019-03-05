@@ -2,6 +2,7 @@
 import sys
 import numpy
 from scipy.constants import epsilon_0, c
+from matplotlib.colors import LogNorm
 import matplotlib.pyplot as plt
 plt.rcParams['figure.dpi'] = 200
 plt.close('all')
@@ -16,7 +17,7 @@ def plot(input_file, z):
     mm = numpy.hstack((0, mm))
     fig, ax = plt.subplots()
     z, rho = r.electron_density(z)
-    mesh = ax.pcolormesh(fs, mm, rho, cmap='magma')
+    mesh = ax.pcolormesh(fs, mm, rho, cmap='magma', norm=LogNorm(vmin=rho.max()/1e6, vmax=rho.max()))
         
     ax.set_xlim(fs.min(), fs.max())
     ax.set_ylim(mm.min(), mm.max())
