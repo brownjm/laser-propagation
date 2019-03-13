@@ -14,6 +14,18 @@ void IO::read(const std::string& filename, std::vector<double>& x, std::vector<d
   }
 }
 
+void IO::read(const std::string& filename, std::vector<double>& x, std::vector<double>& y, std::vector<double>& z) {
+  std::ifstream input(filename);
+  if (!input) throw std::runtime_error("Cannot open input file: " + filename);
+  double xi, yi, zi;
+  while (input >> xi >> yi >> zi) {
+    x.push_back(xi);
+    y.push_back(yi);
+    z.push_back(zi);
+  }
+}
+
+
 void IO::write(const std::string& filename, const std::vector<double>& data) {
   std::ofstream output(filename);
   if (!output) throw std::runtime_error("Cannot open output file: " + filename);

@@ -7,6 +7,8 @@
 
 namespace IO {
   void read(const std::string& filename, std::vector<double>& x, std::vector<double>& y);
+  void read(const std::string& filename, std::vector<double>& x, std::vector<double>& y,
+            std::vector<double>& z);
   
   void write(const std::string& filename, const std::vector<double>& data);
   void write(const std::string& filename, const std::vector<double>& data,
