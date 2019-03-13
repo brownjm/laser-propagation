@@ -33,14 +33,19 @@ public:
     :Linear(linear_index) {}
   
   std::complex<double> kz(double kperp, double omega) const override {
-    std::complex<double> k = n(omega) * omega / Constants::c;
-    std::complex<double> k2 = std::pow(k, 2);
+    std::complex<double> index = n(omega);
+    double k0 = omega / Constants::c;
+    double k = std::real(index) * k0;
+    double alpha = 2*std::imag(index) * k0;
+    
+    double k2 = std::pow(k, 2);
     double kperp2 = std::pow(kperp, 2);
-    if (kperp2 > std::real(k2)) {
+    if (kperp2 > k2) {
       return 0.0;
     }
     else {
-      std::complex<double> kzvalue = std::sqrt(std::pow(k, 2) - std::pow(kperp, 2));
+      double kz_real = std::sqrt(k2 - kperp2);
+      std::complex<double> kzvalue(kz_real, -alpha);
       return kzvalue;
     }
   }
