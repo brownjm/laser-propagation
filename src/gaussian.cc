@@ -6,13 +6,13 @@ namespace Field {
 
   Gaussian::Gaussian(double wavelength, double waist, double focus, double length,
 		     double phase, double delay, double energy, double chirp)
-    :wavelength(wavelength), waist(waist), focus(-focus),
+    :wavelength(wavelength), waist(waist), focus(focus),
      tau(length*1.699/2), phase(phase),
      delay(delay), energy(energy), chirp(chirp) {
     k0 = 2*Constants::pi / wavelength;
     omega0 = k0 * Constants::c;
     zr = k0 * std::pow(waist, 2) / 2;
-    df = -focus / (1 + std::pow(focus/zr, 2));
+    df = focus / (1 + std::pow(focus/zr, 2));
   }
 
   double Gaussian::radius(double z) const {
@@ -49,7 +49,7 @@ namespace Field {
   
   std::complex<double> Gaussian::operator()(double r, double t) const {
     t -= delay;
-    double z = Constants::c * t;
+    double z = -Constants::c * t;
     double w = radius(z);
     double C = curvature(z);
     double psi = gouy(z);
@@ -63,12 +63,12 @@ namespace Field {
           arg += -i*chirp*std::pow(t, 2);
     }
     else {
-      double t_shifted = t - std::pow(r, 2) / (2*Constants::c*focus);
+      double t_shifted = t + std::pow(r, 2) / (2*Constants::c*focus);
       arg += -std::pow(t_shifted/tau, 2);
       arg += -i*chirp*std::pow(t_shifted, 2);
     }
 
-    arg += i*omega0*t;
+    arg += -i*omega0*t;
     arg += i*phase;
     // double A = std::pow(2/Constants::pi, 0.75) / (w * std::sqrt(tau));
     // return A* waist/w * std::exp(arg);

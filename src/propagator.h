@@ -35,6 +35,7 @@ public:
   void add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz);
   
   void linear_step(Radial& radial, double dz);
+  void linear_step(std::complex<double>* A, double dz);
   void linear_step(const std::complex<double>* A, Radial& radial, double dz);
 
   void calculate_electron_density();
@@ -42,7 +43,8 @@ public:
   void calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA);
 
   SimulationData get_data();
-  
+
+  double current_distance;
   Radial field;
   Array2D<double> electron_density;
   

@@ -13,7 +13,8 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
                        double wave_min, double wave_max,
 		       int Nr, double R, int Nk,
 		       double abs_err, double rel_err, double first_step)
-  :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+  :current_distance(0),
+   field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    electron_density(Nr, Nt),
    Ntime(Nt), Nradius(Nr), vg(0),
    kz(field.Nkperp, field.Nomega),
@@ -81,7 +82,7 @@ void Propagator::initialize_linear(const Linear& linear, double omega0) {
     for (int j = 0; j < Nomega; ++j) {
       double kzvalue = kz(i, j).real();
       if (kzvalue > 0.0) {
-        coef(i, j) = imagi / (2*Constants::epsilon_0*kz(i, j).real()) * std::pow(field.omega[j]/Constants::c, 2);
+        coef(i, j) = imagi / (2*Constants::epsilon_0*kz(i, j)) * std::pow(field.omega[j]/Constants::c, 2);
       }
       else {
         coef(i, j) = 0.0;
@@ -160,7 +161,17 @@ void Propagator::linear_step(Radial& radial, double dz) {
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
-      radial.kw(i, j) *= std::exp(-imagi * arg * dz);
+      radial.kw(i, j) *= std::exp(imagi * arg * dz);
+    }
+  }
+}
+
+void Propagator::linear_step(std::complex<double>* A, double dz) {
+  std::complex<double> imagi(0, 1);
+  for (int i = 0; i < Nkperp; ++i) {
+    for (int j = 0; j < Nomega; ++j) {
+      auto arg = kz(i, j) - field.omega[j] / vg;
+      A[i*Nomega + j] *= std::exp(imagi * arg * dz);
     }
   }
 }
@@ -170,18 +181,24 @@ void Propagator::linear_step(const std::complex<double>* A, Radial& radial, doub
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
-      radial.kw(i, j) = A[i*Nomega + j] * std::exp(-imagi * arg * dz);
+      radial.kw(i, j) = A[i*Nomega + j] * std::exp(imagi * arg * dz);
     }
   }
 }
 
 void Propagator::nonlinear_step(double& z, double zi) {
+  current_distance = z;
+  double dz = zi - z;
+  //std::cout << "step goal = " << dz << "\n";
   int status = gsl_odeiv2_driver_apply(driver, &z, zi,
         			       reinterpret_cast<double*>(A.get_data_ptr()));
   if (status != GSL_SUCCESS) {
     throw std::runtime_error("gsl_ode error: " + std::to_string(status));
   }
-  linear_step(A.get_data_ptr(), field, z);
+  //std::cout << "success: z = " << z << "\n";
+  linear_step(A.get_data_ptr(), dz);
+  linear_step(A.get_data_ptr(), field, 0);
+  current_distance = z;
   field.transform_to_temporal();
   calculate_electron_density();
 }
@@ -193,10 +210,18 @@ void Propagator::calculate_electron_density() {
 }
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
+  double dz = z - current_distance;
+  //std::cout << "trying: dz = " << dz << "\n";
   std::fill(dA, dA + Nkperp*Nomega, 0);
   
   // 1: shift to current z
-  linear_step(A, field, z);
+  linear_step(A, field, dz);
+
+  // how do I ensure that A and field.kw don't get too far ahead of and field.rt
+  // can I ask the solver to return after each successful step,
+  // instead of at the distances that I request?
+  // I want to minimize dz in exp(i kz dz), thus minimizing the z alignment mismatch of A & E
+  
 
   // 2: transform A to E
   field.transform_to_temporal();
@@ -206,7 +231,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   for (auto& source : polarization_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
     nonlinear_workspace.transform_to_spectral();
-    linear_step(nonlinear_workspace, -z);
+    linear_step(nonlinear_workspace, -dz);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {
@@ -220,7 +245,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   for (auto& source : current_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
     nonlinear_workspace.transform_to_spectral();
-    linear_step(nonlinear_workspace, -z);
+    linear_step(nonlinear_workspace, -dz);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {

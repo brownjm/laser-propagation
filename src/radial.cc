@@ -191,7 +191,7 @@ void Radial::transform_to_spectral() {
     std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
     std::copy_n(std::begin(temporal.values) + i*Ntime, Ntime, std::begin(Aux_fft));
     apply_temporal_filter();    
-    fftw_execute(forward_plan);
+    fftw_execute(backward_plan);
     apply_spectral_filter();
     std::copy_n(std::begin(Aux_fft)+index_minimum_frequency,
 		Nomega, std::begin(Aux_hankel.values) + i*Nomega);
@@ -242,7 +242,7 @@ void Radial::transform_to_temporal() {
     std::copy_n(std::begin(Aux_hankel.values) + i*Nomega, Nomega,
 		std::begin(Aux_fft) + index_minimum_frequency);
     apply_spectral_filter();
-    fftw_execute(backward_plan);
+    fftw_execute(forward_plan);
     apply_temporal_filter();
     for (auto& a : Aux_fft) { a /= Ntime; }
     std::copy_n(std::begin(Aux_fft), Ntime, std::begin(temporal.values)+i*Ntime);

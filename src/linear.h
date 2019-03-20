@@ -45,7 +45,7 @@ public:
     }
     else {
       double kz_real = std::sqrt(k2 - kperp2);
-      std::complex<double> kzvalue(kz_real, -alpha);
+      std::complex<double> kzvalue(kz_real, alpha);
       return kzvalue;
     }
   }
@@ -66,7 +66,7 @@ public:
     std::complex<double> beta = std::sqrt(std::pow(k, 2) - std::pow(kperp, 2));
     double eps = std::pow(nclad, 2); 
     double alpha = 1.0/(2*R) * std::pow(kperp / k0, 2) * (eps + 1) / std::sqrt(eps - 1);
-    return beta + std::complex<double>(0, -alpha);
+    return beta + std::complex<double>(0, alpha);
   }
 
 private:

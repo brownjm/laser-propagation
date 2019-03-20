@@ -24,10 +24,10 @@ std::complex<double> Medium::index_argon(double omega) {
 std::complex<double> Medium::index_ethanol(double omega) {
   double microns = omega_to_microns(omega);
   std::complex<double> gamma(0, 0.7); // for removing singularity at 3 microns
-  std::complex<double> A = 0.0165*std::pow(microns, 2) / (std::pow(microns, 2) - 9.08 + gamma);
+  std::complex<double> A = 0.0165*std::pow(microns, 2) / (std::pow(microns, 2) - 9.08 - gamma);
   double B = 0.8268*std::pow(microns, 2) / (std::pow(microns, 2) - 0.01039);
   std::complex<double> n = std::sqrt(1.0 + A + B);
-  return std::conj(n);
+  return n;
 }
 
 
