@@ -12,16 +12,15 @@
 Propagator::Propagator(int Nt, double time_min, double time_max,
                        double wave_min, double wave_max,
 		       int Nr, double R, int Nk,
-		       double abs_err, double rel_err, double first_step)
-  :current_distance(0),
-   field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+		       double abs_err, double rel_err, double step)
+  :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    electron_density(Nr, Nt),
    Ntime(Nt), Nradius(Nr), vg(0),
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
    A(field.Nkperp, field.Nomega),
    nonlinear_workspace(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
-   abserr(abs_err), relerr(rel_err), first_step(first_step) {
+   current_distance(0), step(step) {
 
 
   Nomega = field.Nomega;
@@ -30,14 +29,17 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
   std::vector<double> wavelengths;
   for (auto o : field.omega) wavelengths.push_back(2*Constants::pi*Constants::c / o);
 
+  // set up ode solver
   system = {RHSfunction, nullptr, 2*A.vec().size(), this};
-
-  driver = gsl_odeiv2_driver_alloc_y_new(&system, gsl_odeiv2_step_rkf45, first_step,
-  					 abserr, relerr);
+  stepper = gsl_odeiv2_step_alloc(gsl_odeiv2_step_rkf45, 2*A.vec().size());
+  control = gsl_odeiv2_control_y_new(abs_err, rel_err);
+  evolve = gsl_odeiv2_evolve_alloc(2*A.vec().size());
 }
 
 Propagator::~Propagator() {
-  gsl_odeiv2_driver_free(driver);
+  gsl_odeiv2_evolve_free(evolve);
+  gsl_odeiv2_control_free(control);
+  gsl_odeiv2_step_free(stepper);
 }
 
 std::string Propagator::log_grid_info() {
@@ -186,19 +188,30 @@ void Propagator::linear_step(const std::complex<double>* A, Radial& radial, doub
   }
 }
 
-void Propagator::nonlinear_step(double& z, double zi) {
+void Propagator::nonlinear_step(double& z, double z_end) {
   current_distance = z;
-  double dz = zi - z;
-  //std::cout << "step goal = " << dz << "\n";
-  int status = gsl_odeiv2_driver_apply(driver, &z, zi,
-        			       reinterpret_cast<double*>(A.get_data_ptr()));
-  if (status != GSL_SUCCESS) {
-    throw std::runtime_error("gsl_ode error: " + std::to_string(status));
+  double last_step = 0;
+
+  while (z < z_end) {
+    int status = gsl_odeiv2_evolve_apply(evolve, control, stepper,
+                                         &system,
+                                         &z, z_end,
+                                         &step,
+                                         reinterpret_cast<double*>(A.get_data_ptr()));
+
+    if (status != GSL_SUCCESS) {
+      throw std::runtime_error("gsl_ode error: " + std::to_string(status));
+    }
+
+    last_step = z - current_distance;
+    current_distance = z;
+
+    // linearly propagate spectral field
+    linear_step(A.get_data_ptr(), last_step);
   }
-  //std::cout << "success: z = " << z << "\n";
-  linear_step(A.get_data_ptr(), dz);
-  linear_step(A.get_data_ptr(), field, 0);
-  current_distance = z;
+
+  // copy solver's A to the field used for calculating observables
+  field.spectral.values = A.values;
   field.transform_to_temporal();
   calculate_electron_density();
 }
@@ -211,27 +224,19 @@ void Propagator::calculate_electron_density() {
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
   double dz = z - current_distance;
-  //std::cout << "trying: dz = " << dz << "\n";
   std::fill(dA, dA + Nkperp*Nomega, 0);
   
-  // 1: shift to current z
+  // apply linear propagation over distance dz
   linear_step(A, field, dz);
 
-  // how do I ensure that A and field.kw don't get too far ahead of and field.rt
-  // can I ask the solver to return after each successful step,
-  // instead of at the distances that I request?
-  // I want to minimize dz in exp(i kz dz), thus minimizing the z alignment mismatch of A & E
-  
-
-  // 2: transform A to E
+  // transform A to E
   field.transform_to_temporal();
   calculate_electron_density();
 
-  // 3: calculate nonlinearities
+  // calculate contribution of nonlinear polarization terms
   for (auto& source : polarization_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
     nonlinear_workspace.transform_to_spectral();
-    linear_step(nonlinear_workspace, -dz);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {
@@ -240,12 +245,11 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
     }
   }
 
-
+  // calculate contribution of nonlinear current terms
   std::complex<double> imagi(0, 1);
   for (auto& source : current_responses) {
     source->calculate_temporal_response(field, electron_density, nonlinear_workspace);
     nonlinear_workspace.transform_to_spectral();
-    linear_step(nonlinear_workspace, -dz);
     source->finalize_spectral_response(nonlinear_workspace);
     for (int i = 0; i < Nkperp; ++i) {
       for (int j = 0; j < Nomega; ++j) {
@@ -254,6 +258,9 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
       }
     }
   }
+
+  // apply linear propagation to undo previous shift dz
+  linear_step(dA, -dz);
 }
 
 

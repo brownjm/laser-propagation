@@ -20,7 +20,7 @@ public:
   Propagator(int Ntime, double time_min, double time_max,
              double wave_min, double wave_max,
 	     int Nradius, double R, int Nkperp,
-	     double abs_err, double rel_error, double first_step);
+	     double abs_err, double rel_error, double step);
   ~Propagator();
   std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
@@ -39,12 +39,11 @@ public:
   void linear_step(const std::complex<double>* A, Radial& radial, double dz);
 
   void calculate_electron_density();
-  void nonlinear_step(double& z, double zi);
+  void nonlinear_step(double& z, double z_end);
   void calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA);
 
   SimulationData get_data();
 
-  double current_distance;
   Radial field;
   Array2D<double> electron_density;
   
@@ -54,15 +53,15 @@ public:
 
   std::vector<std::unique_ptr<NonlinearResponse>> polarization_responses;
   std::vector<std::unique_ptr<NonlinearResponse>> current_responses;
-  // std::vector<std::unique_ptr<Radial>> polarization_workspaces;
-  // std::vector<std::unique_ptr<Radial>> current_workspaces;
   Radial nonlinear_workspace;
   std::shared_ptr<Ionization::IonizationModel> ionization;
   
   // ode solver
-  double abserr, relerr, first_step;
+  double current_distance, step;
   gsl_odeiv2_system system;
-  gsl_odeiv2_driver* driver;
+  gsl_odeiv2_step* stepper;
+  gsl_odeiv2_control* control;
+  gsl_odeiv2_evolve* evolve;
 };
 
 int RHSfunction(double z, const double y[], double dy[], void* p);
