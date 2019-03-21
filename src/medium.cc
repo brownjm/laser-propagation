@@ -46,7 +46,7 @@ const std::function<std::complex<double>(double)> Medium::select_linear_index(co
 std::complex<double> Medium::pressurize(double pressure, std::function<std::complex<double>(double)> index, double omega) {
   std::complex<double> n0 = index(omega);
   std::complex<double> chi = (std::pow(n0, 2) - 1.0) / (std::pow(n0, 2) + 2.0);
-  std::complex<double> np = std::sqrt((1.0 + 2.0*pressure*chi) / (1.0 - 2.0*chi));
+  std::complex<double> np = std::sqrt((1.0 + 2.0*pressure*chi) / (1.0 - pressure*chi));
   return np;
 }
 
