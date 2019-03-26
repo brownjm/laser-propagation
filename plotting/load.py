@@ -14,7 +14,7 @@ class Results:
         self.config = load_config(filename)
         self.folder = self.config['folder']
 
-        self.distances = load(join(self.folder, self.config['output/distances']))
+        self.distances = load(join(self.folder, self.config['output/distance']))
         self.time = load(join(self.folder, self.config['output/time']))
         self.radius = load(join(self.folder, self.config['output/radius']))
         self.omega = load(join(self.folder, self.config['output/omega']))

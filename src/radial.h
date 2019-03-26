@@ -43,7 +43,7 @@ public:
   }
   
   
-private:
+
   fftw_plan forward_plan, backward_plan;
   std::vector<std::complex<double>> Aux_fft;
   Array2D<std::complex<double>> Aux_hankel;

@@ -110,8 +110,6 @@ void Radial::initialize_spectral_filter(double wave_filter_min, double wave_filt
     double cos = std::cos(Constants::pi/2 * (j - high) / (Nomega-high-1));
     spectral_filter[j] = std::pow(cos, 2);
   }
-  
-  IO::write("spectral_filter.dat", spectral_filter);
 }
 
 void Radial::initialize_temporal_filter(double time_min, double time_max) {
@@ -131,8 +129,6 @@ void Radial::initialize_temporal_filter(double time_min, double time_max) {
     double cos = std::cos(Constants::pi/2 * (j - high) / (Ntime-high-1));
     temporal_filter[j] = std::pow(cos, 2);
   }
-
-  IO::write("temporal_filter.dat", temporal_filter);
 }
 
 void Radial::initialize_radial_domain() {
@@ -159,7 +155,6 @@ void Radial::initialize_radial_domain() {
       dht(i, j) = 2.0 * J0 / (J1*J1*S);
     }
   }
-  IO::write("hankel.dat", dht.vec(), Nradius, Nradius);
 }
 
 
