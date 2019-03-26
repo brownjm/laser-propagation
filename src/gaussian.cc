@@ -59,24 +59,18 @@ namespace Field {
     arg += 0.5*i*k0*std::pow(r, 2)*C;
     arg += -i*psi;
     if (focus == 0.0) {
-          arg += -std::pow(t/tau, 2);
-          arg += -i*chirp*std::pow(t, 2);
+      arg += -std::pow(t/tau, 2) * (1.0 + i*chirp);
     }
     else {
       double t_shifted = t + std::pow(r, 2) / (2*Constants::c*focus);
-      arg += -std::pow(t_shifted/tau, 2);
-      arg += -i*chirp*std::pow(t_shifted, 2);
+      arg += -std::pow(t_shifted/tau, 2) * (1.0 + i*chirp);
     }
 
     arg += -i*omega0*t;
     arg += i*phase;
-    // double A = std::pow(2/Constants::pi, 0.75) / (w * std::sqrt(tau));
-    // return A* waist/w * std::exp(arg);
-    // std::cout << "A0 = " << A * waist/w << "\n";
-    // std::cout << "w/w0=" << waist / w << "\n";
+
     double I0 = energy / (std::pow(waist, 2) * std::pow(Constants::pi/2, 1.5) * tau);
     double E0 = std::sqrt(2*I0 / (Constants::epsilon_0*Constants::c));
-    //std::cout << "E0 = " << E0 << "\n";
     return E0 * std::exp(arg);
   }
 
