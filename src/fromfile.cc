@@ -11,7 +11,7 @@ namespace Field {
     IO::read_binary(filename, field);
 }
 
-  std::complex<double> FromFile::operator()(double r, double t) const {
+  std::complex<double> FromFile::operator()(double, double r, double t) const {
     int i, j;
     auto iter_radius = std::find(std::cbegin(radius), std::cend(radius), r);
     if (iter_radius != std::cend(radius)) {

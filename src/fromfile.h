@@ -10,7 +10,7 @@ namespace Field {
   public:
     FromFile(const std::string& filename, const std::vector<double>& radius,
              const std::vector<double>& time);
-    std::complex<double> operator()(double radius, double time) const override;
+    std::complex<double> operator()(double, double radius, double time) const override;
 
   private:
     const std::string& filename;

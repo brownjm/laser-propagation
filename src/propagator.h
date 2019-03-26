@@ -20,7 +20,7 @@ public:
   Propagator(int Ntime, double time_min, double time_max,
              double wave_min, double wave_max,
 	     int Nradius, double R, int Nkperp,
-	     double abs_err, double rel_error, double step);
+	     double abs_err, double rel_error, double step, double z);
   ~Propagator();
   std::string log_grid_info();
   void initialize_linear(const Linear& linear, double wave0);
@@ -49,6 +49,7 @@ public:
   
   int Ntime, Nradius, Nomega, Nkperp;
   double vg, n2, fraction, scaling, pressure;
+  std::vector<std::complex<double>> index;
   Array2D<std::complex<double>> kz, coef, A;
 
   std::vector<std::unique_ptr<NonlinearResponse>> polarization_responses;

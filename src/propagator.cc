@@ -12,7 +12,7 @@
 Propagator::Propagator(int Nt, double time_min, double time_max,
                        double wave_min, double wave_max,
 		       int Nr, double R, int Nk,
-		       double abs_err, double rel_err, double step)
+		       double abs_err, double rel_err, double step, double z)
   :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    electron_density(Nr, Nt),
    Ntime(Nt), Nradius(Nr), vg(0),
@@ -20,7 +20,7 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
    coef(field.Nkperp, field.Nomega),
    A(field.Nkperp, field.Nomega),
    nonlinear_workspace(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
-   current_distance(0), step(step) {
+   current_distance(z), step(step) {
 
 
   Nomega = field.Nomega;
@@ -60,11 +60,9 @@ std::string Propagator::log_grid_info() {
 }
 
 void Propagator::initialize_linear(const Linear& linear, double omega0) {
-  std::vector<std::complex<double>> index;
   for (int j = 0; j < Nomega; ++j) {
     index.push_back(linear.n(field.omega[j]));
   }
-  IO::write("index.dat", index, index.size(), 1);
   
   std::complex<double> imagi(0, 1);
   for (int i = 0; i < Nkperp; ++i) {
@@ -91,16 +89,13 @@ void Propagator::initialize_linear(const Linear& linear, double omega0) {
       }
     }
   }
-
-  IO::write("kz.dat", kz.vec(), Nkperp, Nomega);
-  IO::write("coef.dat", coef.vec(), Nkperp, Nomega);
 }
 
 
 void Propagator::initialize_field(const Field::Field& Efield) {
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Ntime; ++j) {
-      field.rt(i, j) = Efield(field.radius[i], field.time[j]);
+      field.rt(i, j) = Efield(current_distance, field.radius[i], field.time[j]);
     }
   }
   
@@ -265,7 +260,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
 
 
 SimulationData Propagator::get_data() {
-  SimulationData data = {field, electron_density};
+  SimulationData data = {field, electron_density, *this};
   return data;
 }
 
