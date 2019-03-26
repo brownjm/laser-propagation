@@ -52,6 +52,22 @@ public:
 };
 
 
+class DiffractionLess : public Linear {
+public:
+  DiffractionLess(std::function<std::complex<double>(double)> linear_index)
+    :Linear(linear_index) {}
+  
+  std::complex<double> kz(double, double omega) const override {
+    std::complex<double> index = n(omega);
+    double k0 = omega / Constants::c;
+    double k = std::real(index) * k0;
+    double alpha = 2*std::imag(index) * k0;
+    
+    std::complex<double> kzvalue(k, alpha);
+    return kzvalue;
+  }
+};
+
 
 class Capillary : public Linear {
 public:
