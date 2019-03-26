@@ -20,13 +20,12 @@ namespace Ionization {
 
   class TabulatedRate : public Rate {
   public:
-    TabulatedRate(const std::string& filename, double scaling);
+    TabulatedRate(const std::string& filename);
 
     double ionization_rate(double electric_field) override;
     
   private:
     std::string filename;
-    double scaling;
     std::unique_ptr<Interpolate> interp;
   };
   
@@ -35,16 +34,15 @@ namespace Ionization {
   class IonizationModel {
   public:
     IonizationModel(double density_of_neutrals, double ionizing_fraction, double pressure,
-                    Rate& rate, int Nradius, int Ntime);
+                    std::unique_ptr<Rate> rate, int Nradius, int Ntime);
     void calculate_electron_density(const Radial& electric_field, Array2D<double>& electron_density);
 
 
     double density_of_neutrals, ionizing_fraction;
-    Rate& rate;
+    std::unique_ptr<Rate> rate;
 
     // for performance, to only calculate the rate once per step
     Array2D<double> cached_rate;
-
   };
 
 
