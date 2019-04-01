@@ -11,8 +11,8 @@
 #include "ionization.h"
 #include "simulation_data.h"
 #include "nonlinear_response.h"
+#include "linear.h"
 
-class Linear;
 
 
 class Propagator {
@@ -23,7 +23,7 @@ public:
 	     double abs_err, double rel_error, double step, double z);
   ~Propagator();
   std::string log_grid_info();
-  void initialize_linear(const Linear& linear, double wave0);
+  void initialize_linear(const Linear::Base& linear, double wave0);
   void initialize_field(const Field::Field& field);
   void restart_from(const std::string& spectral_filename);
 

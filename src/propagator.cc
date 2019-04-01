@@ -59,7 +59,7 @@ std::string Propagator::log_grid_info() {
   return ss.str();
 }
 
-void Propagator::initialize_linear(const Linear& linear, double omega0) {
+void Propagator::initialize_linear(const Linear::Base& linear, double omega0) {
   for (int j = 0; j < Nomega; ++j) {
     index.push_back(linear.n(field.omega[j]));
   }
