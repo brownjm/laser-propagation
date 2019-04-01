@@ -15,10 +15,6 @@ namespace Linear {
   double Base::gvd(double kperp, double omega) const {
     double domega = 1e-2 * omega;
     // five-point stencil to compute the derivative d^2/dw^2 k(w)| w=w0
-    // double kz_plus = kz(kperp, omega+domega).real();
-    // double kz_minus = kz(kperp, omega-domega).real();
-    // double kz_0 = kz(kperp, omega).real();
-    // return (kz_plus + kz_minus - 2*kz_0) / std::pow(domega, 2);
     double kpp = (-kz(kperp, omega+2*domega) + 16.0*kz(kperp, omega+domega) - 30.0*kz(kperp, omega) + 16.0*kz(kperp, omega-domega) - kz(kperp, omega-2*domega)).real() / (12*domega*domega);
     return kpp;
   }
