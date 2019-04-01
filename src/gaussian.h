@@ -14,11 +14,11 @@ namespace Field {
     // focus is positive for converging beams
     Gaussian(double wavelength, double waist, double focus, double duration, 
 	     double phase, double delay, double energy,
-             double n0, double chirp, double gvd);
+             double chirp, double gvd);
     std::complex<double> operator()(double z, double radius, double time) const override;
     
   private:
-    double wavelength, waist, focus, tau, phase, delay, energy, n0, chirp, gvd;
+    double wavelength, waist, focus, tau, phase, delay, energy, chirp, gvd;
     double k0, omega0, zr, df;
     
     double radius(double z) const;

@@ -6,11 +6,11 @@ namespace Field {
 
   Gaussian::Gaussian(double wavelength, double waist, double focus, double length,
 		     double phase, double delay, double energy,
-                     double n0, double chirp, double gvd)
+                     double chirp, double gvd)
     :wavelength(wavelength), waist(waist), focus(focus),
      tau(length*1.699/2), phase(phase),
      delay(delay), energy(energy),
-     n0(n0), chirp(chirp), gvd(gvd) {
+     chirp(chirp), gvd(gvd) {
     k0 = 2*Constants::pi / wavelength;
     omega0 = k0 * Constants::c;
     zr = k0 * std::pow(waist, 2) / 2;
