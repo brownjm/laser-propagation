@@ -1,38 +1,35 @@
-[simulation]
-type = freespace
-starting_mode = new
-spectral_file = A000.dat
-
 [propagation]
-start_distance = 0
-end_distance = 4
+starting_distance = 0
+ending_distance = 4
 steps = 4
 
 [time]
 N = 2048
 time_min = -100e-15
 time_max = 200e-15
-time_filter_min = -90e-15
-time_filter_max = 150e-15
-wave_min = 200e-9
-wave_max = 4000e-6
-wave_filter_min = 250e-9
-wave_filter_max = 3000e-6
+wavelength_min = 150e-9
+wavelength_max = 4000e-6
 
 [space]
 N = 200
-R = 10e-3
+radius_max = 10e-3
+
+[filtering]
+time_filter_min = -90e-15
+time_filter_max = 150e-15
+wavelength_filter_min = 1800e-9
+wavelength_filter_max = 3000e-6
 
 [ode]
-abserr = 1e6
-relerr = 0
+absolute_error = 1e6
+relative_error = 0
 first_step = 1e-3
 
 [laser]
 type = gaussian
 length = 20e-15
 waist = 4e-3
-wavelength = 1500e-9
+wavelength = 800e-9
 focus = 2
 energy = 1e-3
 chirp = 0
@@ -40,13 +37,17 @@ phase_deg = 0
 delay = 0
 
 [medium]
-medium = air
-rate = ../../data/ionization-oxygen.txt
-fraction = 0.2
-scaling = 1
-density_of_neutrals = 2.5e25
-n2 = 8e-24
+type = freespace
+index = air
 pressure = 1
+
+[kerr]
+n2 = 8e-24
+
+[ionization]
+filename = ../../data/ionization-oxygen.txt
+ionizing_fraction = 0.2
+density_of_neutrals = 2.5e25
 collision_time = 350e-15
 ionization_potential = 1.933779e-18
 
@@ -55,7 +56,7 @@ ionization_potential = 1.933779e-18
 temporal_field = E
 spectral_field = A
 electron_density = Rho
-distances = distances.dat
+distance = distance.dat
 time = time.dat
 radius = radius.dat
 omega = omega.dat
