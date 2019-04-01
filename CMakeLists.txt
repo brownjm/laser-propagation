@@ -27,6 +27,7 @@ add_executable(main-${GIT_BRANCH}.out
   src/interpolate.cc
   src/util.cc
   src/medium.cc
+  src/linear.cc
   src/distance.cc
   src/energy.cc
   src/temporal_field.cc
