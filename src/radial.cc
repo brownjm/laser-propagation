@@ -7,10 +7,6 @@
 
 #include <Eigen/Dense>
 
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Md;
-typedef Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Mcd;
-
-
 Radial::Radial(int Nt, double time_min, double time_max,
                double wave_min, double wave_max,
 	       int Nr, double R, int Nk)
@@ -205,6 +201,8 @@ void Radial::transform_to_spectral() {
 
 
   // Use eigen for Hankel transform
+  using Md = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+  using Mcd = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
   Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
   Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
   Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
@@ -225,6 +223,8 @@ void Radial::transform_to_temporal() {
   // }
 
   // Use eigen for Hankel transform
+  using Md = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+  using Mcd = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
   Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
   Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
   Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
