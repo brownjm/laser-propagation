@@ -63,9 +63,8 @@ int main(int argc, char* argv[]) {
     prop.initialize_filters(time_filter_min, time_filter_max,
                             wavelength_filter_min, wavelength_filter_max);
     
-    initialize_laser_field(prop, p);
     initialize_linear_medium(prop, p);
-
+    initialize_laser_field(prop, p);
     if (p.section_exists("kerr")) {
       double pressure = p.get<double>("medium/pressure");
       double n2 = p.get<double>("kerr/n2");
@@ -124,10 +123,9 @@ void initialize_laser_field(Propagator& prop, Parameters::Parameters& p) {
     double phase_deg = p.get<double>("laser/phase_deg");
     double phase = phase_deg / 180.0 * Constants::pi;
     double delay = p.get<double>("laser/delay");
-    double n0 = p.get<double>("laser/n0");
-    double gvd = p.get<double>("laser/gvd");
+    double gvd = p.get<double>("calculated/gvd");
     Field::Gaussian laser_field(wavelength, waist, focus, length, phase, delay, energy,
-                                n0, chirp, gvd);
+                                chirp, gvd);
     prop.initialize_field(laser_field);
   }
   else if (laser_type == "file") {
@@ -149,22 +147,34 @@ void initialize_linear_medium(Propagator& prop, Parameters::Parameters& p) {
   std::string index_name = p.get<std::string>("medium/index");
   double pressure = p.get<double>("medium/pressure");
 
-  auto index = Medium::select_linear_index(index_name);
+  Medium::IndexFunction index = Medium::select_linear_index(index_name);
   double wavelength = p.get<double>("laser/wavelength");
   double omega0 = 2*Constants::pi*Constants::c / wavelength;
+  auto n = index(omega0);
+  p.set("calculated/n0", n.real());
+  
   if (type == "capillary") {
     double radius_max = p.get<double>("space/radius_max");
     double cladding = p.get<double>("capillary/cladding");
-    Capillary linear(index, radius_max, cladding, pressure);
+    Linear::Capillary linear(index, radius_max, cladding, pressure);
     prop.initialize_linear(linear, omega0);
+
+    double gvd = linear.gvd(0, omega0);
+    p.set("calculated/gvd", gvd);
   }
   else if (type == "freespace") {
-    FreeSpace linear(index);
+    Linear::FreeSpace linear(index);
     prop.initialize_linear(linear, omega0);
+    
+    double gvd = linear.gvd(0, omega0);
+    p.set("calculated/gvd", gvd);
   }
   else if (type == "diffractionless") {
-    DiffractionLess linear(index);
+    Linear::DiffractionLess linear(index);
     prop.initialize_linear(linear, omega0);
+
+    double gvd = linear.gvd(0, omega0);
+    p.set("calculated/gvd", gvd);
   }
   
   else {
