@@ -25,6 +25,11 @@ public:
   void transform_to_spectral();
   void transform_to_temporal();
 
+  void forward_hankel();
+  void forward_fft();
+  void backward_fft();
+  void backward_hankel();
+  
   // convenient access functions
   inline std::complex<double> rt(int i, int j) const {
     return temporal(i, j);

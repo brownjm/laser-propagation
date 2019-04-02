@@ -38,12 +38,12 @@ void Radial::initialize_temporal_domain() {
 				  reinterpret_cast<fftw_complex*>(Aux_fft.data()),
 				  reinterpret_cast<fftw_complex*>(Aux_fft.data()),
 				  FFTW_FORWARD, FFTW_MEASURE);
-  //FFTW_FORWARD, FFTW_ESTIMATE);
+
   backward_plan = fftw_plan_dft_1d(Ntime,
 				   reinterpret_cast<fftw_complex*>(Aux_fft.data()),
 				   reinterpret_cast<fftw_complex*>(Aux_fft.data()),
 				   FFTW_BACKWARD, FFTW_MEASURE);
-  //FFTW_BACKWARD, FFTW_ESTIMATE);
+
 
   // fftw plan may have written data to the auxillary array if
   // FFTW_{MEASURE,PATIENT,EXHAUSTIVE} is used, therefore we set all values to zero
@@ -176,61 +176,27 @@ void Radial::apply_spectral_filter() {
 }
 
 void Radial::transform_to_spectral() {
-  // Perform Fourier transform on each temporal row
-  // Copy active frequencies from Aux_fft -> Aux_hankel
-  for (int i = 0; i < Nradius; ++i) {
-    std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
-    std::copy_n(std::begin(temporal.values) + i*Ntime, Ntime, std::begin(Aux_fft));
-    apply_temporal_filter();    
-    fftw_execute(backward_plan);
-    apply_spectral_filter();
-    std::copy_n(std::begin(Aux_fft)+index_minimum_frequency,
-		Nomega, std::begin(Aux_hankel.values) + i*Nomega);
-  }
-  
-  // Perform Hankel transform on each frequency column
-  // Copy data from Aux_hankel -> spectral
-  // for (int o = 0; o < Nomega; ++o) {
-  //   for (int i = 0; i < Nkperp; ++i) {
-  //     spectral(i, o) = 0.0;
-  //     for (int j = 0; j < Nradius; ++j) {
-  // 	spectral(i, o) += dht(i, j) * Aux_hankel(j, o);
-  //     }
-  //   }
-  // }
-
-
-  // Use eigen for Hankel transform
-  using Md = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-  using Mcd = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-  Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
-  Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
-  Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
-  spectral2 = dht2.block(0, 0, Nkperp, Nradius) * Aux_hankel2;
+  backward_fft();
+  backward_hankel();
 }
 
 
 void Radial::transform_to_temporal() {
-  // Hankel transform on each frequency column
-  // Copy data from spectral -> Aux_hankel
-  // for (int o = 0; o < Nomega; ++o) {
-  //   for (int i = 0; i < Nradius; ++i) {
-  //     Aux_hankel(i, o) = 0.0;
-  //     for (int j = 0; j < Nkperp; ++j) {
-  // 	Aux_hankel(i, o) += dht(i, j) * spectral(j, o);
-  //     }
-  //   }
-  // }
+  forward_hankel();
+  forward_fft();
+}
 
-  // Use eigen for Hankel transform
+void Radial::forward_hankel() {
   using Md = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
   using Mcd = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
   Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
   Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
   Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
   Aux_hankel2 = dht2.block(0, 0, Nradius, Nkperp) * spectral2;
+}
 
-  // Perform inverse fourier transform on each row
+void Radial::forward_fft() {
+  // Perform forward fourier transform on each row
   // copy data from Aux_fft -> temporal
   for (int i = 0; i < Nradius; ++i) {
     std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
@@ -241,5 +207,29 @@ void Radial::transform_to_temporal() {
     apply_temporal_filter();
     for (auto& a : Aux_fft) { a /= Ntime; }
     std::copy_n(std::begin(Aux_fft), Ntime, std::begin(temporal.values)+i*Ntime);
+  }
+}
+
+void Radial::backward_hankel() {
+  // Use eigen for Hankel transform
+  using Md = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+  using Mcd = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+  Eigen::Map<Md> dht2(dht.get_data_ptr(), Nradius, Nradius);
+  Eigen::Map<Mcd> Aux_hankel2(Aux_hankel.get_data_ptr(), Nradius, Nomega);
+  Eigen::Map<Mcd> spectral2(spectral.get_data_ptr(), Nkperp, Nomega);
+  spectral2 = dht2.block(0, 0, Nkperp, Nradius) * Aux_hankel2;
+}
+
+void Radial::backward_fft() {
+  // Perform Fourier transform on each temporal row
+  // Copy active frequencies from Aux_fft -> Aux_hankel
+  for (int i = 0; i < Nradius; ++i) {
+    std::fill(std::begin(Aux_fft), std::end(Aux_fft), 0);
+    std::copy_n(std::begin(temporal.values) + i*Ntime, Ntime, std::begin(Aux_fft));
+    apply_temporal_filter();    
+    fftw_execute(backward_plan);
+    apply_spectral_filter();
+    std::copy_n(std::begin(Aux_fft)+index_minimum_frequency,
+		Nomega, std::begin(Aux_hankel.values) + i*Nomega);
   }
 }
