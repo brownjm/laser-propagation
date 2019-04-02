@@ -6,14 +6,19 @@ public:
     chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure;
   }
 
-  void calculate_temporal_response(const Radial& electric_field, const Array2D<double>&, Radial& response) override {
-    for (int i = 0; i < response.Nradius; ++i) {
-      for (int j = 0; j < response.Ntime; ++j) {
-        const double E = electric_field.rt(i, j).real();
-        response.rt(i, j) = Constants::epsilon_0 * chi3 * std::pow(E, 3);
+  void calculate(const std::vector<double>& radius,
+                 const std::vector<double>& time,
+                 const Array2D<std::complex<double>>& electric_field,
+                 const Array2D<double>&,
+                 Array2D<std::complex<double>>& response) override {
+    for (std::size_t i = 0; i < radius.size(); ++i) {
+      for (std::size_t j = 0; j < time.size(); ++j) {
+        double Ereal = electric_field(i, j).real();
+        response(i, j) += Constants::epsilon_0 * chi3 * std::pow(Ereal, 3);
       }
     }
   }
-  
+
+private:
   double chi3;
 };

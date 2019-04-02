@@ -5,27 +5,26 @@ public:
   Plasma(double collision, double pressure)
     : collision_time(collision / pressure) {}
 
-  void calculate_temporal_response(const Radial& electric_field, const Array2D<double>& electron_density, Radial& response) override {
-    for (int i = 0; i < response.Nradius; ++i) {
-      for (int j = 0; j < response.Ntime; ++j) {
-        const double E = electric_field.rt(i, j).real();
-        response.rt(i, j) = electron_density(i, j) * E;
+
+  void calculate(const std::vector<double>& radius,
+                 const std::vector<double>& time,
+                 const Array2D<std::complex<double>>& electric_field,
+                 const Array2D<double>& electron_density,
+                 Array2D<std::complex<double>>& response) override {
+    // integrate dJ/dt + J(t)/tau_c = e^2/m * rho(t) E(t)
+    // using the exponential time differencing method:
+    // S.M. Cox, P.C. Matthews, J. Comp. Phys. 176, 430 (2002)
+    double dt = time[1] - time[0];
+    double exp = std::exp(-dt / collision_time);
+    double eta = dt * std::pow(Constants::e, 2) / (2 * Constants::m_e);
+    for (std::size_t i = 0; i < radius.size(); ++i) {
+      response(i, 0) += exp * electron_density(i, 0) * electric_field(i, 0).real();
+      for (std::size_t j = 1; j < time.size(); ++j) {
+        response(i, j) += exp * (response(i, j-1) + eta*electron_density(i, j-1)*electric_field(i, j-1).real()) + eta*electron_density(i, j)*electric_field(i, j).real();
       }
     }
   }
 
-  void finalize_spectral_response(Radial& response) override {
-    const double tau = collision_time;
-    const double A = std::pow(Constants::e, 2) * tau / Constants::m_e;
-    const std::complex<double> imagi(0, 1);
-    for (int i = 0; i < response.Nkperp; ++i) {
-      for (int j = 0; j < response.Nomega; ++j) {
-        const double ot = response.omega[j] * tau;
-        const std::complex<double> B = (1.0 + imagi*ot) / (1.0 + std::pow(ot, 2));
-        response.kw(i, j) *= A * B;
-      }
-    }
-  }
-
+private:
   double collision_time;
 };
