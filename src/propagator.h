@@ -54,7 +54,7 @@ public:
 
   std::vector<std::unique_ptr<NonlinearResponse>> polarization_responses;
   std::vector<std::unique_ptr<NonlinearResponse>> current_responses;
-  Radial nonlinear_workspace;
+  Radial workspace_polarization, workspace_current;
   std::shared_ptr<Ionization::IonizationModel> ionization;
   
   // ode solver
