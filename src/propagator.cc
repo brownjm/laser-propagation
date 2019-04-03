@@ -83,7 +83,6 @@ void Propagator::initialize_linear(const Linear::Base& linear, double omega0) {
     for (int j = 0; j < Nomega; ++j) {
       double kzvalue = kz(i, j).real();
       if (kzvalue > 0.0) {
-        // coef(i, j) = imagi / (2*Constants::epsilon_0*kz(i, j)) * std::pow(field.omega[j]/Constants::c, 2);
         coef(i, j) = field.omega[j] / (2*Constants::epsilon_0*std::pow(Constants::c, 2)*kz(i, j));
       }
       else {
@@ -223,7 +222,6 @@ void Propagator::calculate_electron_density() {
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
   double dz = z - current_distance;
-  std::fill(dA, dA + Nkperp*Nomega, 0);
   
   // apply linear propagation over distance dz
   linear_step(A, field, dz);
@@ -232,11 +230,17 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   field.transform_to_temporal();
   calculate_electron_density();
 
+  std::fill(std::begin(workspace_polarization.temporal.values),
+            std::end(workspace_polarization.temporal.values),
+            0);
   // calculate contributions from nonlinear source terms
   for (auto& source : polarization_responses) {
     source->calculate(field.radius, field.time, field.temporal, electron_density,
                       workspace_polarization.temporal);
   }
+  std::fill(std::begin(workspace_current.temporal.values),
+            std::end(workspace_current.temporal.values),
+            0);
   for (auto& source : current_responses) {
     source->calculate(field.radius, field.time, field.temporal, electron_density,
                       workspace_current.temporal);
