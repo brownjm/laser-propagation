@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <algorithm>
 
 Propagator::Propagator(int Nt, double time_min, double time_max,
                        double wave_min, double wave_max,
@@ -19,8 +20,8 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
    A(field.Nkperp, field.Nomega),
-   workspace_polarization(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
-   workspace_current(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+   workspace1(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
+   workspace2(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
    current_distance(z), step(step) {
 
 
@@ -137,10 +138,10 @@ void Propagator::initialize_filters(double time_filter_min, double time_filter_m
                                     double wave_filter_min, double wave_filter_max) {
   field.initialize_temporal_filter(time_filter_min, time_filter_max);
   field.initialize_spectral_filter(wave_filter_min, wave_filter_max);
-  workspace_polarization.initialize_temporal_filter(time_filter_min, time_filter_max);
-  workspace_polarization.initialize_spectral_filter(wave_filter_min, wave_filter_max);
-  workspace_current.initialize_temporal_filter(time_filter_min, time_filter_max);
-  workspace_current.initialize_spectral_filter(wave_filter_min, wave_filter_max);
+  workspace1.initialize_temporal_filter(time_filter_min, time_filter_max);
+  workspace1.initialize_spectral_filter(wave_filter_min, wave_filter_max);
+  workspace2.initialize_temporal_filter(time_filter_min, time_filter_max);
+  workspace2.initialize_spectral_filter(wave_filter_min, wave_filter_max);
 }
 
 
@@ -221,51 +222,51 @@ void Propagator::calculate_electron_density() {
 }
 
 void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::complex<double>* dA) {
+  // proposed step size
   double dz = z - current_distance;
   
   // apply linear propagation over distance dz
   linear_step(A, field, dz);
 
-  // transform A to E
+  // transform field(k, omega) -> field(r, t) and calculate electron density rho(r, t)
   field.transform_to_temporal();
   calculate_electron_density();
 
-  std::fill(std::begin(workspace_polarization.temporal.values),
-            std::end(workspace_polarization.temporal.values),
-            0);
-  // calculate contributions from nonlinear source terms
+  // calculate contributions from nonlinear polarizations Pnl(r, t)
+  std::fill(std::begin(workspace1.temporal.values), std::end(workspace1.temporal.values), 0);
   for (auto& source : polarization_responses) {
     source->calculate(field.radius, field.time, field.temporal, electron_density,
-                      workspace_polarization.temporal);
+                      workspace1.temporal);
   }
-  std::fill(std::begin(workspace_current.temporal.values),
-            std::end(workspace_current.temporal.values),
-            0);
+  // transform Pnl(r, t) -> Pnl(r, omega)
+  workspace1.backward_fft();
+
+  // calculate contributions from nonlinear currents Jnl(r, t)
+  std::fill(std::begin(workspace2.temporal.values), std::end(workspace2.temporal.values), 0);
   for (auto& source : current_responses) {
     source->calculate(field.radius, field.time, field.temporal, electron_density,
-                      workspace_current.temporal);
+                      workspace2.temporal);
   }
+  // transform Jnl(r, t) -> Jnl(r, omega)
+  workspace2.backward_fft();
 
-  // fourier transform responses
-  workspace_polarization.backward_fft();
-  workspace_current.backward_fft();
-
-  // combine responses
+  // combine responses: i omega Pnl(r, omega) - Jnl(r, omega)
   std::complex<double> imagi(0, 1);
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Nomega; ++j) {
-      std::complex<double> P = workspace_polarization.Aux_hankel(i, j);
-      std::complex<double> J = workspace_current.Aux_hankel(i, j);
       double omega = field.omega[j];
-      workspace_polarization.Aux_hankel(i, j) = coef(i, j) * (imagi*omega*P - J);
+      workspace1.Aux_hankel(i, j) = imagi*omega*workspace1.Aux_hankel(i, j) - workspace2.Aux_hankel(i, j);
     }
   }
 
-  workspace_polarization.backward_hankel();
+  // transform total response to (k, omega)
+  workspace1.backward_hankel();
 
-  std::copy(std::begin(workspace_polarization.spectral.values),
-            std::end(workspace_polarization.spectral.values),
-            dA);
+  // multiply total response (k, omega) by nonlinear coupling
+  // coefficient and place into dA
+  std::transform(std::begin(workspace1.spectral.values),
+                 std::end(workspace1.spectral.values),
+                 std::begin(coef.values), dA, std::multiplies<std::complex<double>>());
 
   // apply linear propagation to undo previous shift dz
   linear_step(dA, -dz);
