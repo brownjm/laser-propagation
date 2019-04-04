@@ -28,7 +28,8 @@ namespace Medium {
     std::complex<double> gamma(0, 0.7); // for removing singularity at 3 microns
     std::complex<double> A = 0.0165*std::pow(microns, 2) / (std::pow(microns, 2) - 9.08 - gamma);
     double B = 0.8268*std::pow(microns, 2) / (std::pow(microns, 2) - 0.01039);
-    std::complex<double> n = std::sqrt(1.0 + A + B);
+    std::complex<double> C = 0.002*std::pow(microns, 2) / (std::pow(microns, 2) - 90.6 - gamma);
+    std::complex<double> n = std::sqrt(1.0 + A + B + C);
     return n;
   }
 
