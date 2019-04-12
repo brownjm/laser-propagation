@@ -15,7 +15,7 @@ Propagator::Propagator(int Nt, double time_min, double time_max,
 		       int Nr, double R, int Nk,
 		       double abs_err, double rel_err, double step, double z)
   :field(Nt, time_min, time_max, wave_min, wave_max, Nr, R, Nk),
-   electron_density(Nr, Nt),
+   electron_density(Nr, Nt), ionization_rate(Nr, Nt),
    Ntime(Nt), Nradius(Nr), vg(0),
    kz(field.Nkperp, field.Nomega),
    coef(field.Nkperp, field.Nomega),
@@ -153,8 +153,8 @@ void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
   current_responses.push_back(std::move(current));
 }
 
-void Propagator::add_ionization(std::shared_ptr<Ionization::IonizationModel> ioniz) {
-  ionization = ioniz;
+void Propagator::add_ionization(std::unique_ptr<Ionization> ioniz) {
+  ionization = std::move(ioniz);
 }
 
 void Propagator::linear_step(Radial& radial, double dz) {
@@ -217,7 +217,7 @@ void Propagator::nonlinear_step(double& z, double z_end) {
 
 void Propagator::calculate_electron_density() {
   if (ionization) {
-    ionization->calculate_electron_density(field, electron_density);
+    ionization->calculate_electron_density(field, ionization_rate, electron_density);
   }
 }
 

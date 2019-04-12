@@ -2,47 +2,42 @@
 #include "io.h"
 #include "radial.h"
 #include "constants.h"
+#include <iostream>
 
-namespace Ionization {
-
-
-  TabulatedRate::TabulatedRate(const std::string& filename)
-    :filename(filename) {
-    std::vector<double> intensity, rate;
-    IO::read(filename, intensity, rate);
-    std::vector<double> field(intensity.size());
-    for (std::size_t i = 0; i < field.size(); ++i) {
-      double E = std::sqrt(2*intensity[i] / (Constants::epsilon_0 * Constants::c));
-      field[i] = E / std::sqrt(2);
-    }
-    interp = std::make_unique<Interpolate>(field, rate);
-    //interp = std::make_unique<Interpolate>(intensity, rate);
-  }
-
-  double TabulatedRate::ionization_rate(double electric_field) {
-    //const double I = 0.5 * Constants::epsilon_0 * Constants::c * std::pow(electric_field, 2);
-    //return interp->operator()(2*I);
-    return interp->operator()(std::abs(electric_field));
-  }
-
-  IonizationModel::IonizationModel(double density_of_neutrals, double ionizing_fraction,
-                                   double pressure, std::unique_ptr<Rate> rate, int Nradius, int Ntime)
-    :density_of_neutrals(pressure*density_of_neutrals), ionizing_fraction(ionizing_fraction),
-     rate(std::move(rate)), cached_rate(Nradius, Ntime) {}
-
-  void IonizationModel::calculate_electron_density(const Radial& electric_field,
-                                              Array2D<double>& electron_density) {
-    const double dt = electric_field.time[1] - electric_field.time[0];
-    for (int i = 0; i < electric_field.Nradius; ++i) {
-      Util::IntegratorTrapz integrator(dt);
-      for (int j = 0; j < electric_field.Ntime; ++j) {
-        double E = electric_field.rt(i, j).real();
-        double W = rate->ionization_rate(E);
-        cached_rate(i, j) = W;
-        double probability = integrator.add(W);
-        electron_density(i, j) = density_of_neutrals * ionizing_fraction * probability;
-      }
-    }
-  }
-  
+Ionization::Ionization(const std::string& filename, double density_of_neutrals,
+                       double pressure, double ionizing_fraction)
+  :density_of_neutrals(density_of_neutrals*pressure), ionizing_fraction(ionizing_fraction) {
+  IO::read(filename, intensity_values, rate_values);
+    
+  // interpolation
+  spline = gsl_spline_alloc(gsl_interp_linear, intensity_values.size());
+  gsl_spline_init(spline, intensity_values.data(), rate_values.data(), intensity_values.size());
+  acc = gsl_interp_accel_alloc();
 }
+
+Ionization::~Ionization() {
+  gsl_interp_accel_free(acc);
+  gsl_spline_free(spline);
+}
+
+void Ionization::calculate_electron_density(const Radial& electric_field,
+                                            Array2D<double>& ionization_rate,
+                                            Array2D<double>& electron_density) {
+
+  double dt = electric_field.time[1] - electric_field.time[0];
+  double eta = ionizing_fraction * density_of_neutrals * dt / 2;
+  for (int i = 0; i < electric_field.Nradius; ++i) {
+    double E = electric_field.rt(i, 0).real();
+    double I = Constants::epsilon_0*Constants::c * std::pow(E, 2);
+    ionization_rate(i, 0) = rate(I);
+    electron_density(i, 0) = eta * ionization_rate(i, 0);
+    for (int j = 1; j < electric_field.Ntime; ++j) {
+      double E = electric_field.rt(i, j).real();
+      double I = Constants::epsilon_0*Constants::c * std::pow(E, 2);
+      ionization_rate(i, j) = rate(I);
+      double exp = std::exp(-(ionization_rate(i, j) + ionization_rate(i, j-1)) / 2 * dt);
+      electron_density(i, j) = exp * (electron_density(i, j-1) + eta * ionization_rate(i, j-1)) + eta * ionization_rate(i, j);
+    }
+  }
+}
+

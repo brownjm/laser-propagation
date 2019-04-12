@@ -9,43 +9,26 @@
 
 class Radial;
 
+class Ionization {
+public:
+  Ionization(const std::string& filename, double density_of_neutrals, double pressure,
+             double ionizing_fraction);
 
-namespace Ionization {
+  ~Ionization();
 
-
-  class Rate {
-  public:
-    virtual double ionization_rate(double electric_field) = 0;
-  };
-
-  class TabulatedRate : public Rate {
-  public:
-    TabulatedRate(const std::string& filename);
-
-    double ionization_rate(double electric_field) override;
+  double rate(double I) {
+    return gsl_spline_eval(spline, I, acc);
+  }
     
-  private:
-    std::string filename;
-    std::unique_ptr<Interpolate> interp;
-  };
-  
+  void calculate_electron_density(const Radial& electric_field,
+                                  Array2D<double>& ionization_rate,
+                                  Array2D<double>& electron_density);
 
+  double density_of_neutrals, ionizing_fraction;
+  std::vector<double> intensity_values, rate_values;
+  gsl_spline* spline;
+  gsl_interp_accel* acc;
+};
 
-  class IonizationModel {
-  public:
-    IonizationModel(double density_of_neutrals, double ionizing_fraction, double pressure,
-                    std::unique_ptr<Rate> rate, int Nradius, int Ntime);
-    void calculate_electron_density(const Radial& electric_field, Array2D<double>& electron_density);
-
-
-    double density_of_neutrals, ionizing_fraction;
-    std::unique_ptr<Rate> rate;
-
-    // for performance, to only calculate the rate once per step
-    Array2D<double> cached_rate;
-  };
-
-
-}
 
 #endif // IONIZATION_H_

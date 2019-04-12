@@ -72,13 +72,14 @@ int main(int argc, char* argv[]) {
     }
     
     if (p.key_exists("ionization/filename")) {
-      std::string rate_filename = p.get<std::string>("ionization/filename");
+      std::string filename = p.get<std::string>("ionization/filename");
       double density_of_neutrals = p.get<double>("ionization/density_of_neutrals");
       double pressure = p.get<double>("medium/pressure");
       double fraction = p.get<double>("ionization/ionizing_fraction");
-      std::unique_ptr<Ionization::Rate> rate = std::make_unique<Ionization::TabulatedRate>(rate_filename);
-      auto ionization_model = std::make_shared<Ionization::IonizationModel>(density_of_neutrals, fraction, pressure, std::move(rate), Ntime, Nradius);
-      prop.add_ionization(ionization_model);
+
+      auto ioniz = std::make_unique<Ionization>(filename, density_of_neutrals, pressure,
+                                                fraction);
+      prop.add_ionization(std::move(ioniz));
       prop.calculate_electron_density();
 
 
@@ -86,7 +87,10 @@ int main(int argc, char* argv[]) {
       prop.add_current(std::make_unique<Plasma>(collision_time, pressure));
 
       double ionization_potential = p.get<double>("ionization/ionization_potential");
-      prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential, density_of_neutrals, pressure, fraction, ionization_model));
+      prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential,
+                                                             density_of_neutrals,
+                                                             pressure, fraction,
+                                                             prop.ionization_rate));
     }
 
     Driver driver(prop);
