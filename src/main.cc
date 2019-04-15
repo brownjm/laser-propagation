@@ -10,6 +10,7 @@
 #include "timer.h"
 #include "io.h"
 #include "kerr.h"
+#include "ramankerr.h"
 #include "plasma.h"
 #include "nonlinear_absorption.h"
 
@@ -69,6 +70,14 @@ int main(int argc, char* argv[]) {
       double pressure = p.get<double>("medium/pressure");
       double n2 = p.get<double>("kerr/n2");
       prop.add_polarization(std::make_unique<Kerr>(n2, pressure));
+    }
+    else if (p.section_exists("ramankerr")) {
+      double pressure = p.get<double>("medium/pressure");
+      double n2 = p.get<double>("ramankerr/n2");
+      double fraction = p.get<double>("ramankerr/fraction");
+      double gamma = p.get<double>("gamma");
+      double lambda = p.get<double>("lambda");
+      prop.add_polarization(std::make_unique<RamanKerr>(n2, fraction, gamma, lambda, pressure));
     }
     
     if (p.key_exists("ionization/filename")) {
