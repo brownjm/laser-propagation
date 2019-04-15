@@ -107,7 +107,7 @@ void Propagator::initialize_field(const Field::Field& Efield) {
   // copy spectral field to auxillary A which is passed to ODE solver
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
-      A(i, j) = field.kw(i, j);
+      A(i, j) = field.ko(i, j);
     }
   }
 
@@ -127,7 +127,7 @@ void Propagator::restart_from(const std::string& spectral_filename) {
   // copy spectral field to auxillary A which is passed to ODE solver
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
-      A(i, j) = field.kw(i, j);
+      A(i, j) = field.ko(i, j);
     }
   }
 
@@ -162,7 +162,7 @@ void Propagator::linear_step(Radial& radial, double dz) {
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
-      radial.kw(i, j) *= std::exp(imagi * arg * dz);
+      radial.ko(i, j) *= std::exp(imagi * arg * dz);
     }
   }
 }
@@ -182,7 +182,7 @@ void Propagator::linear_step(const std::complex<double>* A, Radial& radial, doub
   for (int i = 0; i < Nkperp; ++i) {
     for (int j = 0; j < Nomega; ++j) {
       auto arg = kz(i, j) - radial.omega[j] / vg;
-      radial.kw(i, j) = A[i*Nomega + j] * std::exp(imagi * arg * dz);
+      radial.ko(i, j) = A[i*Nomega + j] * std::exp(imagi * arg * dz);
     }
   }
 }
@@ -255,7 +255,7 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Nomega; ++j) {
       double omega = field.omega[j];
-      workspace1.Aux_hankel(i, j) = imagi*omega*workspace1.Aux_hankel(i, j) - workspace2.Aux_hankel(i, j);
+      workspace1.ro(i, j) = imagi*omega*workspace1.ro(i, j) - workspace2.ro(i, j);
     }
   }
 
