@@ -6,11 +6,12 @@
 namespace Observers {
 
   SpectralField::SpectralField(const std::string& fn)
-    :filename(fn) {}
+    :number(0), filename(fn) {}
   
-  void SpectralField::notify(int current_step, double, const SimulationData& data) {
-    IO::write_binary(IO::enumerate_filename(filename, current_step),
+  void SpectralField::notify(int, double, const SimulationData& data) {
+    IO::write_binary(IO::enumerate_filename(filename, number),
 		     data.field.spectral.vec());
+    number++;
   }
   
   void SpectralField::finalize() {}

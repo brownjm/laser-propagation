@@ -4,12 +4,12 @@
 namespace Observers {
 
   ElectronDensity::ElectronDensity(const std::string& fn)
-    :filename(fn) {}
+    :number(0), filename(fn) {}
   
-  void ElectronDensity::notify(int current_step, double,
-		      const SimulationData& data) {
-    IO::write_binary(IO::enumerate_filename(filename, current_step),
+  void ElectronDensity::notify(int, double, const SimulationData& data) {
+    IO::write_binary(IO::enumerate_filename(filename, number),
 		     data.electron_density.vec());
+    number++;
   }
   
   void ElectronDensity::finalize() {}

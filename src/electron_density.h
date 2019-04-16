@@ -13,6 +13,7 @@ namespace Observers {
     void finalize() override;
     
   private:
+    int number;
     std::string filename;
   };
   
