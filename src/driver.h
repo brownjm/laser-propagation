@@ -24,6 +24,8 @@ private:
   std::vector<std::unique_ptr<Observers::Observer>> observers;
   void notify_observers();
   void finalize(); // signals the observers to perform a final computation
+
+  void print_runtime_data();
 };
 
 

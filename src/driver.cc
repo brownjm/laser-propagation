@@ -18,33 +18,20 @@ void Driver::add_observer(std::unique_ptr<Observers::Observer> obs) {
 
 void Driver::run(double start_distance, double stop_distance, int steps) {
   physical_distance = start_distance;
-
-  // log the output to a file
-  std::ostringstream ss;
-  //ss << propagator.log_grid_info();
   
-  // time execution
+  // runtime data header
   Timer timer;
+  std::ostringstream ss;
   ss << "*** Runtime values ***\n";
   ss << "Started: " << timer.timestamp() << "\n";
-
-  // gives the observers the initial data
-  notify_observers();
-
-  auto data = propagator.get_data();
-  
   ss << "z [m]    Energy [J]   Imax [W/m^2]   Rhomax [1/m^3]\n";
-  
-  ss << std::fixed << std::setprecision(3);
-  ss << physical_distance << "    ";
-  ss << std::scientific << Util::energy(data.field) << "    ";
-  ss << Util::max_intensity(data.field) << "      ";
-  ss << Util::max_density(data.electron_density) << "\n";
-
   std::cout << ss.str();
   IO::write_append("log", ss.str());
   ss.str(std::string());
   ss.clear();
+  
+  // gives the observers the initial data
+  notify_observers();
 
   // advance the simulation forward
   double dt = (stop_distance - start_distance) / steps;
@@ -54,27 +41,14 @@ void Driver::run(double start_distance, double stop_distance, int steps) {
     current_step = i;
     physical_distance = solver_distance + start_distance;
     notify_observers();
-
-    auto data = propagator.get_data();
-    ss << std::fixed << std::setprecision(3);
-    ss << physical_distance << "    ";
-    ss << std::scientific << Util::energy(data.field) << "    ";
-    ss << Util::max_intensity(data.field) << "      ";
-    ss << Util::max_density(data.electron_density) << "\n";
-
-
-    std::cout << ss.str();
-    IO::write_append("log", ss.str());
-    ss.str(std::string());
-    ss.clear();
+    print_runtime_data();
   }
 
   finalize();
 
+  // runtime footer
   ss << "Ended:   " << timer.timestamp() << "\n";
   ss << "Elapsed: " << timer.elapsed() << "\n";
-  std::cout << ss.str();
-  IO::write_append("log", ss.str());
 }
 
 void Driver::notify_observers() {
@@ -90,3 +64,15 @@ void Driver::finalize() {
   }
 }
 
+void Driver::print_runtime_data() {
+  auto data = propagator.get_data();
+  std::ostringstream ss;
+  ss << std::fixed << std::setprecision(3);
+  ss << physical_distance << "    ";
+  ss << std::scientific << Util::energy(data.field) << "    ";
+  ss << Util::max_intensity(data.field) << "      ";
+  ss << Util::max_density(data.electron_density) << "\n";
+
+  std::cout << ss.str();
+  IO::write_append("log", ss.str());
+}
