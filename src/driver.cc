@@ -37,6 +37,8 @@ void Driver::run(double start_distance, double stop_distance, int steps_cheap, i
   ss.str(std::string());
   ss.clear();
 
+  print_runtime_data();
+
   // calculate distances
   double dz_cheap = (stop_distance - start_distance) / steps_cheap;
   double dz_expensive = (stop_distance - start_distance) / steps_expensive;
