@@ -9,10 +9,8 @@ namespace Observers {
   public:
     Kperp(const std::string& filename)
       :filename(filename) {}
-    void notify(int current_step, double, const SimulationData& data) override {
-      if (current_step == 0) {
-        IO::write(filename, data.field.kperp);
-      }
+    void notify(int, double, const SimulationData& data) override {
+      IO::write(filename, data.field.kperp);
     }
     void finalize() override {}
     

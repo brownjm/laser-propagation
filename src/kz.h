@@ -9,10 +9,8 @@ namespace Observers {
   public:
     Kz(const std::string& filename)
       :filename(filename) {}
-    void notify(int current_step, double, const SimulationData& data) override {
-      if (current_step == 0) {
-        IO::write("kz.dat", data.propagator.kz.vec(), data.field.Nkperp, data.field.Nomega);
-      }
+    void notify(int, double, const SimulationData& data) override {
+      IO::write("kz.dat", data.propagator.kz.vec(), data.field.Nkperp, data.field.Nomega);
     }
     void finalize() override {}
     

@@ -9,10 +9,8 @@ namespace Observers {
   public:
     Index(const std::string& filename)
       :filename(filename) {}
-    void notify(int current_step, double, const SimulationData& data) override {
-      if (current_step == 0) {
-        IO::write(filename, data.propagator.index, data.propagator.index.size(), 1);
-      }
+    void notify(int, double, const SimulationData& data) override {
+      IO::write(filename, data.propagator.index, data.propagator.index.size(), 1);
     }
     void finalize() override {}
     
