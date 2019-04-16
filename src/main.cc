@@ -106,7 +106,8 @@ int main(int argc, char* argv[]) {
     initialize_observers(driver, p);
     
     double ending_distance = p.get<double>("propagation/ending_distance");
-    int steps = p.get<int>("propagation/steps");
+    int steps_cheap = p.get<int>("propagation/num_reports_cheap");
+    int steps_expensive = p.get<int>("propagation/num_reports_expensive");
 
     std::stringstream ss;
     p.print(ss);
@@ -115,7 +116,7 @@ int main(int argc, char* argv[]) {
     IO::write_append("log", ss.str());
     std::cout << ss.str();
 
-    driver.run(starting_distance, ending_distance, steps);
+    driver.run(starting_distance, ending_distance, steps_cheap, steps_expensive);
   }
   catch (std::exception& err) {
     std::cerr << err.what() << "\n";
@@ -196,28 +197,40 @@ void initialize_linear_medium(Propagator& prop, Parameters::Parameters& p) {
 }
 
 template <class T>
-void conditionally_add(Driver& driver, Parameters::Parameters& p, const std::string& name) {
+void conditionally_add(Driver& driver, Parameters::Parameters& p, const std::string& name, ObserverType obstype) {
   if (p.key_exists(name)) {
     std::string filename = p.get<std::string>(name);
-    driver.add_observer(std::make_unique<T>(filename));
+    driver.add_observer(std::make_unique<T>(filename), obstype);
   }
 }
 
 void initialize_observers(Driver& driver, Parameters::Parameters& p) {
-  conditionally_add<Observers::Time>(driver, p, "output/time");
-  conditionally_add<Observers::Radius>(driver, p, "output/radius");
-  conditionally_add<Observers::Omega>(driver, p, "output/omega");
-  conditionally_add<Observers::Kperp>(driver, p, "output/kperp");
-  conditionally_add<Observers::Wavelength>(driver, p, "output/wavelength");
-  conditionally_add<Observers::Distance>(driver, p, "output/distance");
-  conditionally_add<Observers::TemporalField>(driver, p, "output/temporal_field");
-  conditionally_add<Observers::SpectralField>(driver, p, "output/spectral_field");
-  conditionally_add<Observers::ElectronDensity>(driver, p, "output/electron_density");
-  conditionally_add<Observers::Energy>(driver, p, "output/energy");
-  conditionally_add<Observers::MaxIntensity>(driver, p, "output/max_intensity");
-  conditionally_add<Observers::MaxDensity>(driver, p, "output/max_density");
-  conditionally_add<Observers::Hankel>(driver, p, "output/hankel");
-  conditionally_add<Observers::Coef>(driver, p, "output/coef");
-  conditionally_add<Observers::Index>(driver, p, "output/index");
-  conditionally_add<Observers::Kz>(driver, p, "output/kz");
+  // Add the coordinates and other diagnostics that are only run once
+  conditionally_add<Observers::Time>(driver, p, "output/time", ObserverType::Once);
+  conditionally_add<Observers::Radius>(driver, p, "output/radius", ObserverType::Once);
+  conditionally_add<Observers::Omega>(driver, p, "output/omega", ObserverType::Once);
+  conditionally_add<Observers::Kperp>(driver, p, "output/kperp", ObserverType::Once);
+  conditionally_add<Observers::Wavelength>(driver, p, "output/wavelength",
+                                           ObserverType::Once);
+  conditionally_add<Observers::Hankel>(driver, p, "output/hankel", ObserverType::Once);
+  conditionally_add<Observers::Coef>(driver, p, "output/coef", ObserverType::Once);
+  conditionally_add<Observers::Index>(driver, p, "output/index", ObserverType::Once);
+  conditionally_add<Observers::Kz>(driver, p, "output/kz", ObserverType::Once);
+
+  // Add the field and density observers
+  conditionally_add<Observers::Distance>(driver, p, "output/distance",
+                                         ObserverType::Expensive);
+  conditionally_add<Observers::TemporalField>(driver, p, "output/temporal_field",
+                                              ObserverType::Expensive);
+  conditionally_add<Observers::SpectralField>(driver, p, "output/spectral_field",
+                                              ObserverType::Expensive);
+  conditionally_add<Observers::ElectronDensity>(driver, p, "output/electron_density",
+                                                ObserverType::Expensive);
+
+  // Add cheaper diagnostics
+  conditionally_add<Observers::Energy>(driver, p, "output/energy", ObserverType::Cheap);
+  conditionally_add<Observers::MaxIntensity>(driver, p, "output/max_intensity",
+                                             ObserverType::Cheap);
+  conditionally_add<Observers::MaxDensity>(driver, p, "output/max_density",
+                                           ObserverType::Cheap);
 }
