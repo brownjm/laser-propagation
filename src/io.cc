@@ -115,6 +115,14 @@ void IO::write_append(const std::string& filename, double value) {
   output << value << "\n";
 }
 
+void IO::write_append(const std::string& filename, double x, double y) {
+  std::ofstream output(filename, std::ios::out | std::ios::app);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
+  output.precision(std::numeric_limits<double>::max_digits10);
+  output << std::scientific;
+  output << x << " " << y << "\n";
+}
+
 void IO::write_append(const std::string& filename, const std::string& text) {
   std::ofstream output(filename, std::ios::out | std::ios::app);
   if (!output) throw std::runtime_error("Cannot open output file: " + filename);

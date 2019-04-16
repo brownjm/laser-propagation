@@ -24,6 +24,7 @@ namespace IO {
 
   void clear_contents(const std::string& filename);   // clear contents of file
   void write_append(const std::string& filename, double value);
+  void write_append(const std::string& filename, double x, double y);
   void write_append(const std::string& filename, const std::string& text);
 }
 

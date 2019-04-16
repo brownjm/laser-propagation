@@ -9,9 +9,9 @@ namespace Observers {
     IO::clear_contents(filename);
   }
   
-  void MaxIntensity::notify(int, double, const SimulationData& data) {
+  void MaxIntensity::notify(int, double distance, const SimulationData& data) {
     double I = Util::max_intensity(data.field);
-    IO::write_append(filename, I);
+    IO::write_append(filename, distance, I);
   }
   
   void MaxIntensity::finalize() {}
