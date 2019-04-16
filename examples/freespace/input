@@ -1,7 +1,8 @@
 [propagation]
 starting_distance = 0
 ending_distance = 4
-steps = 4
+num_reports_cheap = 40
+num_reports_expensive = 4
 
 [time]
 N = 2048

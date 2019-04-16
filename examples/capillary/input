@@ -1,7 +1,8 @@
 [propagation]
 starting_distance = 0
-ending_distance = 1
-steps = 4
+ending_distance = 0.5
+num_reports_cheap = 50
+num_reports_expensive = 4
 
 [time]
 N = 2048
@@ -22,7 +23,7 @@ wavelength_filter_min = 250e-9
 wavelength_filter_max = 2000e-9
 
 [ode]
-absolute_error = 1e6
+absolute_error = 1e8
 relative_error = 1e-4
 first_step = 1e-3
 
