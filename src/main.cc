@@ -154,6 +154,24 @@ void initialize_laser_field(Propagator& prop, Parameters::Parameters& p) {
   else {
     throw std::runtime_error("Unsupported laser/type: " + laser_type);
   }
+
+  // calculate Pin and Pcr
+  double wavelength = p.get<double>("laser/wavelength");
+  double waist = p.get<double>("laser/waist");
+  double length = p.get<double>("laser/length");
+  double energy = p.get<double>("laser/energy");
+  double n0 = p.get<double>("calculated/n0");
+  double tau = length*1.699/2;
+  double I0 = energy / (std::pow(waist, 2) * std::pow(Constants::pi/2, 1.5) * tau);
+  double Pin = Constants::pi * std::pow(waist, 2) * I0 / 2;
+  p.set("calculated/Pin", Pin);
+
+  if (p.section_exists("kerr") || p.section_exists("ramankerr")) {
+    double n2 = p.get<double>("kerr/n2");
+    double k0 = 2*Constants::pi / wavelength;
+    double Pcr = 3.77*Constants::pi*n0 / (2*std::pow(k0, 2) * n2);
+    p.set("calculated/Pcr", Pcr);
+  }
 }
 
 void initialize_linear_medium(Propagator& prop, Parameters::Parameters& p) {
