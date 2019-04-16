@@ -9,7 +9,8 @@ namespace Observers {
 class Observer {
 public:
   // all observers will receive these parameters at intervals
-  virtual void notify(int current_step, double current_time, const SimulationData& data) = 0;
+  virtual void notify(int current_step, double current_distance,
+                      const SimulationData& data) = 0;
 
   // signals to the observers to perform a final computation,
   // such as write their results to a file
