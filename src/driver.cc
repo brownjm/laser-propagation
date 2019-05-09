@@ -81,6 +81,8 @@ void Driver::run(double start_distance, double stop_distance, int steps_cheap, i
   // runtime footer
   ss << "Ended:   " << timer.timestamp() << "\n";
   ss << "Elapsed: " << timer.elapsed() << "\n";
+  std::cout << ss.str();
+  IO::write_append("log", ss.str());
 }
 
 void Driver::notify_once() {
