@@ -95,7 +95,7 @@ The provided scripts can display the following items:
   - MaxRho(z): max_density.py
 
 
-All of the plotting scripts use `load.py` to work with the data that was written during the simulation. If you wish to create your own plotting scripts, then you simply need to import the `load` module and the class `Results` to load the data that you're interested in. For example,
+All of the plotting scripts use `load.py` to work with the data that was written during the simulation. If you wish to create your own plotting scripts, simply import the `load` module and use the class `Results` to load the data that you're interested in. For example,
 ```python
 import load
 results = load.Results(input_filename)
