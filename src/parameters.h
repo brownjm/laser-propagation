@@ -51,6 +51,17 @@ public:
   void load(const std::string& filename);  // add these parameters to current ones
   void save(const std::string& filename);  // save current parameters to a file
   
+  // check if key exists
+  bool key_exists(const std::string& key) {
+    auto iter = parameters.find(key);
+    return iter != parameters.end();
+  }
+
+  bool section_exists(const std::string& section_name) {
+    auto section_map = getSectionMap(section_name);
+    return !section_map.empty();
+  }
+  
   // get the value of a key
   template <class T>
   void get(const std::string& key, T& value);

@@ -4,11 +4,12 @@
 namespace Observers {
 
   TemporalField::TemporalField(const std::string& fn)
-    :filename(fn) {}
+    :number(0), filename(fn) {}
   
-  void TemporalField::notify(int current_step, double, const SimulationData& data) {
-    IO::write_binary(IO::enumerate_filename(filename, current_step),
+  void TemporalField::notify(int, double, const SimulationData& data) {
+    IO::write_binary(IO::enumerate_filename(filename, number),
 		     data.field.temporal.vec());
+    number++;
   }
   
   void TemporalField::finalize() {}

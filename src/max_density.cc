@@ -9,9 +9,9 @@ namespace Observers {
     IO::clear_contents(filename);
   }
   
-  void MaxDensity::notify(int, double, const SimulationData& data) {
+  void MaxDensity::notify(int, double distance, const SimulationData& data) {
     double rhomax = Util::max_density(data.electron_density);
-    IO::write_append(filename, rhomax);
+    IO::write_append(filename, distance, rhomax);
   }
   
   void MaxDensity::finalize() {}

@@ -1,7 +1,6 @@
 #ifndef DISTANCE_H_
 #define DISTANCE_H_
 
-#include <string>
 #include "observer.h"
 
 namespace Observers {

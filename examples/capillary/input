@@ -1,61 +1,67 @@
-[simulation]
-type = capillary
+[propagation]
+starting_distance = 0
+ending_distance = 0.5
+num_reports_cheap = 50
+num_reports_expensive = 4
 
 [time]
 N = 2048
 time_min = -100e-15
 time_max = 100e-15
-time_filter_min = -90e-15
-time_filter_max = 90e-15
-wave_min = 200e-9
-wave_max = 3000e-9
-wave_filter_min = 250e-9
-wave_filter_max = 1500e-9
+wavelength_min = 200e-9
+wavelength_max = 3000e-9
 
 
 [space]
-N = 50
-R = 250e-6
+N = 100
+radius_max = 250e-6
+
+[filtering]
+time_filter_min = -90e-15
+time_filter_max = 90e-15
+wavelength_filter_min = 250e-9
+wavelength_filter_max = 2000e-9
 
 [ode]
-abserr = 1e10
-relerr = 0
+absolute_error = 1e8
+relative_error = 1e-4
 first_step = 1e-3
 
 [laser]
+type = gaussian
 length = 10e-15
 waist = 180e-6
 wavelength = 1030e-9
 focus = 0
 energy = 30e-6
+chirp = 0
 phase_deg = 0
 delay = -25e-15
 
 [medium]
-medium = argon
-rate = ../../data/ionization-argon.txt
-fraction = 1
-scaling = 1
-density_of_neutrals = 2.5e25
-n2 = 20e-24
+type = capillary
+index = argon
 pressure = 3.3
-collision_time = 350e-15
-ionization_potential = 2.5250303e-18
 
 [capillary]
-radius = 250e-6
 cladding = 1.45
-modes = 3
+modes = 5
 
-[propagation]
-z = 1
-steps = 4
+[kerr]
+n2 = 20e-24
+
+[ionization]
+filename = ../../data/ionization-argon.txt
+ionizing_fraction = 1
+density_of_neutrals = 2.5e25
+collision_time = 190e-15
+ionization_potential = 2.5250303e-18
 
 [output]
 temporal_field = E
 spectral_field = A
 electron_density = Rho
-distances = distances.dat
+distance = distance.dat
 time = time.dat
 radius = radius.dat
 omega = omega.dat

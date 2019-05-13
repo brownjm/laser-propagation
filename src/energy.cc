@@ -9,9 +9,9 @@ namespace Observers {
     IO::clear_contents(filename);
   }
   
-  void Energy::notify(int, double, const SimulationData& data) {
+  void Energy::notify(int, double distance, const SimulationData& data) {
     double energy = Util::energy(data.field);
-    IO::write_append(filename, energy);
+    IO::write_append(filename, distance, energy);
   }
   
   void Energy::finalize() {}

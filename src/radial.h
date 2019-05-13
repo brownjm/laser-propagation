@@ -25,8 +25,13 @@ public:
   void transform_to_spectral();
   void transform_to_temporal();
 
-
-  // convenient access functions
+  void forward_hankel();
+  void forward_fft();
+  void backward_fft();
+  void backward_hankel();
+  
+  // convenience functions
+  // field in radial space and in time
   inline std::complex<double> rt(int i, int j) const {
     return temporal(i, j);
   }
@@ -35,16 +40,26 @@ public:
     return temporal(i, j);
   }
 
-  inline std::complex<double> kw(int i, int j) const {
+  // field in radial space and frequency
+  inline std::complex<double> ro(int i, int j) const {
+    return Aux_hankel(i, j);
+  }
+
+  inline std::complex<double>& ro(int i, int j) {
+    return Aux_hankel(i, j);
+  }
+
+  // field in k-perpendicular and frequency
+  inline std::complex<double> ko(int i, int j) const {
     return spectral(i, j);
   }
 
-  inline std::complex<double>& kw(int i, int j) {
+  inline std::complex<double>& ko(int i, int j) {
     return spectral(i, j);
   }
   
   
-private:
+
   fftw_plan forward_plan, backward_plan;
   std::vector<std::complex<double>> Aux_fft;
   Array2D<std::complex<double>> Aux_hankel;

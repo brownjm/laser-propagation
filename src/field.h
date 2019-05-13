@@ -7,7 +7,7 @@ namespace Field {
 
   class Field {
   public:
-    virtual std::complex<double> operator()(double radius, double time) const = 0;
+    virtual std::complex<double> operator()(double z, double radius, double time) const = 0;
   };
   
 }

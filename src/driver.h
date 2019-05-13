@@ -9,11 +9,13 @@ namespace Observers {
   class Observer;
 }
 
+enum class ObserverType {Once, Cheap, Expensive};
+
 class Driver {
 public:
   Driver(Propagator& propagator);
-  void add_observer(std::unique_ptr<Observers::Observer> obs);
-  void run(double distance, int steps);
+  void add_observer(std::unique_ptr<Observers::Observer> obs, ObserverType obstype);
+  void run(double start_distance, double end_distance, int steps_cheap, int steps_expensive);
 
 private:
   int current_step;
@@ -21,9 +23,13 @@ private:
   
   Propagator& propagator;
 
-  std::vector<std::unique_ptr<Observers::Observer>> observers;
-  void notify_observers();
+  std::vector<std::unique_ptr<Observers::Observer>> once, cheap, expensive;
+  void notify_once();
+  void notify_cheap();
+  void notify_expensive();
   void finalize(); // signals the observers to perform a final computation
+
+  void print_runtime_data();
 };
 
 

@@ -14,7 +14,7 @@ class Results:
         self.config = load_config(filename)
         self.folder = self.config['folder']
 
-        self.distances = load(join(self.folder, self.config['output/distances']))
+        self.distances = load(join(self.folder, self.config['output/distance']))
         self.time = load(join(self.folder, self.config['output/time']))
         self.radius = load(join(self.folder, self.config['output/radius']))
         self.omega = load(join(self.folder, self.config['output/omega']))
@@ -82,20 +82,20 @@ class Results:
     
     def energy(self):
         """Returns the distances and energy values along propagation"""
-        energies = load(join(self.folder, self.config['output/energy']))
-        return self.distances, energies
+        z, energies = load(join(self.folder, self.config['output/energy']))
+        return z, energies
 
 
     def max_intensity(self):
         """Returns the distances and maximum intensity values along propagation"""
-        maxI = load(join(self.folder, self.config['output/max_intensity']))
-        return self.distances, maxI
+        z, maxI = load(join(self.folder, self.config['output/max_intensity']))
+        return z, maxI
 
     
     def max_electron_density(self):
         """Returns the distances and maximum electron density values along propagation"""
-        max_den = load(join(self.folder, self.config['output/max_density']))
-        return self.distances, max_den
+        z, max_den = load(join(self.folder, self.config['output/max_density']))
+        return z, max_den
     
     
     def _make_filename(self, name, i):

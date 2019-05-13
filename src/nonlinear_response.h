@@ -9,13 +9,15 @@
 class NonlinearResponse {
 public:
   
-  // Overload this function with the actual medium response
-  // and fill in the values of reponse.rt(i, j)
-  virtual void calculate_temporal_response(const Radial& electric_field, const Array2D<double>& electron_density, Radial& response) = 0;
-
-  // Overload this function if the spectral response needs to be
-  // modified after the temporal_to_spectral() transform
-  virtual void finalize_spectral_response(Radial&) {}
+  // Overload this function with the actual medium response and add
+  // its values to response(i,j) where the indices (i, j) correspond
+  // to (radius, time)
+  // e.g. response(i,j) += func(electric_field(i,j).real());
+  virtual void calculate(const std::vector<double>& radius,
+                         const std::vector<double>& time,
+                         const Array2D<std::complex<double>>& electric_field,
+                         const Array2D<double>& electron_density,
+                         Array2D<std::complex<double>>& response) = 0;
 };
 
 #endif // NONLINEAR_RESPONSE
