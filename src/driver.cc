@@ -66,10 +66,12 @@ void Driver::run(double start_distance, double stop_distance, int steps_cheap, i
     double z_next = distances[i];
     propagator.nonlinear_step(current_distance, z_next);
 
-    if (std::abs(std::remainder(current_distance, dz_cheap)) < 1e-6) {
+    // check if distance propagated is near to an interval where a
+    // cheap or expensive diagnostic should be performed
+    if (std::abs(std::remainder(current_distance-start_distance, dz_cheap)) < 1e-6) {
       notify_cheap();
     }
-    if (std::abs(std::remainder(current_distance, dz_expensive)) < 1e-6) {
+    if (std::abs(std::remainder(current_distance-start_distance, dz_expensive)) < 1e-6) {
       notify_expensive();
     }
         
