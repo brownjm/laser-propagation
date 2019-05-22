@@ -28,7 +28,7 @@ def plot(input_file, z):
 
     plt.colorbar(mesh, ax=ax)
     
-    # fig.tight_layout()
+    fig.tight_layout()
         
     plt.show()
 

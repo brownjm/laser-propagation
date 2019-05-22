@@ -19,7 +19,7 @@ def plot(input_file, z):
     
     ax.set_xlabel('time [fs]')
     ax.set_ylabel('electric field [V/m]')
-    
+    ax.set_title('z = {:1.2f}m'.format(z))
     fig.tight_layout()
         
     plt.show()

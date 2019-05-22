@@ -19,12 +19,12 @@ def plot(input_file, z):
     ax.plot(thz, spec)
         
     ax.set_xlim(0, thz.max())
-    # ax.set_ylim(0, 1.1)
     ax.set_yscale('log')
+    ax.set_ylim(1e-10, 2)
     
     ax.set_xlabel('frequency [THz]')
     ax.set_ylabel('spectral intensity [scaled]')
-    
+    ax.set_title('z = {:1.2f}m'.format(z))    
     fig.tight_layout()
         
     plt.show()

@@ -18,10 +18,11 @@ def plot(input_file, z):
         
     ax.set_xlim(nm.min(), nm.max())
     ax.set_yscale('log')
-    ax.set_ylim(1e-6, 2)
+    ax.set_ylim(1e-10, 2)
     
     ax.set_xlabel('wavelength [nm]')
     ax.set_ylabel('spectral intensity [scaled]')
+    ax.set_title('z = {:1.2f}m'.format(z))
     
     fig.tight_layout()
         
