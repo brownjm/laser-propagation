@@ -7,9 +7,9 @@ num_reports_expensive = 4
 [time]
 N = 2048
 time_min = -100e-15
-time_max = 100e-15
+time_max = 150e-15
 wavelength_min = 200e-9
-wavelength_max = 3000e-9
+wavelength_max = 4e-6
 
 
 [space]
@@ -17,15 +17,15 @@ N = 100
 radius_max = 250e-6
 
 [filtering]
-time_filter_min = -90e-15
-time_filter_max = 90e-15
+time_filter_min = -60e-15
+time_filter_max = 50e-15
 wavelength_filter_min = 250e-9
-wavelength_filter_max = 2000e-9
+wavelength_filter_max = 3e-6
 
 [ode]
-absolute_error = 1e8
-relative_error = 1e-4
-first_step = 1e-3
+absolute_error = 1e7
+relative_error = 0
+first_step = 1e-2
 
 [laser]
 type = gaussian
@@ -45,13 +45,14 @@ pressure = 3.3
 
 [capillary]
 cladding = 1.45
-modes = 5
+modes = 10
 
 [kerr]
 n2 = 20e-24
 
 [ionization]
-filename = ../../data/ionization-argon.txt
+generate = ionization.txt
+formula = ilkov
 ionizing_fraction = 1
 density_of_neutrals = 2.5e25
 collision_time = 190e-15

@@ -9,22 +9,22 @@ N = 2048
 time_min = -100e-15
 time_max = 200e-15
 wavelength_min = 150e-9
-wavelength_max = 4000e-6
+wavelength_max = 4e-6
 
 [space]
 N = 200
-radius_max = 10e-3
+radius_max = 12e-3
 
 [filtering]
-time_filter_min = -90e-15
-time_filter_max = 150e-15
-wavelength_filter_min = 1800e-9
-wavelength_filter_max = 3000e-6
+time_filter_min = -50e-15
+time_filter_max = 100e-15
+wavelength_filter_min = 200e-9
+wavelength_filter_max = 3e-6
 
 [ode]
 absolute_error = 1e6
 relative_error = 0
-first_step = 1e-3
+first_step = 1e-2
 
 [laser]
 type = gaussian
@@ -46,7 +46,8 @@ pressure = 1
 n2 = 8e-24
 
 [ionization]
-filename = ../../data/ionization-oxygen.txt
+generate = ionization.txt
+formula = ilkov
 ionizing_fraction = 0.2
 density_of_neutrals = 2.5e25
 collision_time = 350e-15
