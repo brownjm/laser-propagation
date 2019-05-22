@@ -28,7 +28,7 @@ starting_distance = 0
 ending_distance = 1 # final propagation distance of simulation
 ```
 
-Since the input file is used to control the simulation there are some sections that are required and others that are optional. See the wiki for a complete description of all available sections.
+Since the input file is used to control the simulation there are some sections that are required and others that are optional. See the documentation for a complete description of all available sections.
 
 ## Running
  To run the simulation use
@@ -88,8 +88,8 @@ The provided scripts can display the following items:
 - spectral representation of the electric field
   - angularly resolved spectrum |A(k,omega)|^2: spectral.py
   - angularly integrated spectrum |S(wavelength)|^2: spectrum.py
-  - log |S(wavelength)|^2: logspectrum.py
-  - log |S(THz)|^2: thz-spectrum.py
+  - log |S(wavelength)|^2: log_spectrum.py
+  - log |S(THz)|^2: thz_spectrum.py
 - electron density
   - Rho(r, t): density.py
   - MaxRho(z): max_density.py

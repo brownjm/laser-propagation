@@ -12,7 +12,8 @@ import density
 import intensity
 import onaxis
 import spectrum
-import logspectrum
+import log_spectrum
+import thz_spectrum
 import energy
 import max_intensity
 import max_density
@@ -65,13 +66,19 @@ for i, z in enumerate(r.distances):
 
 
 for i, z in enumerate(r.distances):
-    logspectrum.plot(input_file, z)
-    filename = 'logspectrum{:03d}.png'.format(i)
+    log_spectrum.plot(input_file, z)
+    filename = 'log_spectrum{:03d}.png'.format(i)
     plt.savefig(filename)
     print('Wrote:', filename)
     plt.close('all')
 
-
+for i, z in enumerate(r.distances):
+    thz_spectrum.plot(input_file, z)
+    filename = 'thz_spectrum{:03d}.png'.format(i)
+    plt.savefig(filename)
+    print('Wrote:', filename)
+    plt.close('all')
+    
 energy.plot(input_file)
 filename = 'energy.png'
 plt.savefig(filename)
