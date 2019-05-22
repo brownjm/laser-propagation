@@ -2,7 +2,9 @@
 examples/*/*
 !examples/*/input
 build
-doc
+doc/*
+!doc/documentation.tex
+!doc/documentation.pdf
 tests
 old
 __pycache__
