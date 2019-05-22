@@ -14,6 +14,8 @@
 #include "plasma.h"
 #include "nonlinear_absorption.h"
 
+template <typename T> std::string type_name();
+
 void initialize_laser_field(Propagator& prop, Parameters::Parameters& params);
 void initialize_linear_medium(Propagator& prop, Parameters::Parameters& params);
 void initialize_observers(Driver& driver, Parameters::Parameters& params);
@@ -80,8 +82,60 @@ int main(int argc, char* argv[]) {
       prop.add_polarization(std::make_unique<RamanKerr>(n2, fraction, gamma, lambda, pressure));
     }
     
-    if (p.key_exists("ionization/filename")) {
-      std::string filename = p.get<std::string>("ionization/filename");
+    if (p.section_exists("ionization")) {
+      std::string filename;
+      if (p.key_exists("ionization/filename")) {
+        filename = p.get<std::string>("ionization/filename");
+      } else if (p.key_exists("ionization/generate")) {
+        filename = p.get<std::string>("ionization/generate");
+        std::string formula = p.get<std::string>("ionization/formula");
+        double ionization_potential = p.get<double>("ionization/ionization_potential");
+        double wavelength = p.get<double>("laser/wavelength");
+        
+        GenerateRate gen(ionization_potential, wavelength);
+        std::function<double(double)> rate;
+        if (formula == "adk") {
+          rate = std::bind(&GenerateRate::adk, gen, std::placeholders::_1);
+        }
+        else if (formula == "mpi") {
+          rate = std::bind(&GenerateRate::mpi, gen, std::placeholders::_1);
+        }
+        else if (formula == "tunnel") {
+          rate = std::bind(&GenerateRate::tunnel, gen, std::placeholders::_1);
+        }
+        else if (formula == "yudin") {
+          rate = std::bind(&GenerateRate::yudin, gen, std::placeholders::_1);
+        }
+        else if (formula == "ilkov") {
+          rate = std::bind(&GenerateRate::ilkov, gen, std::placeholders::_1);
+        }
+        else {
+          throw std::runtime_error("Unknown rate formula '" + formula + "'");
+        }
+        
+        std::vector<double> intensities, rates;
+        // add a rate to zero for zero intensity
+        intensities.push_back(0);
+        rates.push_back(0);
+        // calc rate for 10^13 - 10^20 W/m^2
+        for (int i = 13; i < 20; ++i) {
+          for (int n = 100; n < 1000; ++n) {
+            double I = 0.01*n*std::pow(10, i);
+            intensities.push_back(I);
+            rates.push_back(rate(I));
+          }
+        }
+
+        // write out rate
+        std::ofstream output(filename);
+        for (std::size_t i = 0; i < intensities.size(); ++i) {
+          output << intensities[i] << " " << rates[i] << "\n";
+        }
+      }
+      else {
+        throw std::runtime_error("Section [ionization] must contain either 'filename' or 'generate'");
+      }
+        
       double density_of_neutrals = p.get<double>("ionization/density_of_neutrals");
       double pressure = p.get<double>("medium/pressure");
       double fraction = p.get<double>("ionization/ionizing_fraction");
