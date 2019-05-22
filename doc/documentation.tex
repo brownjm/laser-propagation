@@ -520,6 +520,18 @@ where $W$ is the rate of ionization and $\rho_{nt}$ is the
 exponential time differencing method
 \[\rho(t+\Delta t) = \exp\left[-\int_t^{t+\Delta t} W(E(t')) dt'\right]\left\{\rho(t) + \frac{\Delta t}{2} \rho_{nt}W(E(t))\right\} + \frac{\Delta t}{2} \rho_{nt} W(E(t+\Delta t))\]
 
+If the keys \texttt{generate} and \texttt{formula} are present the
+rate of ionization is calculated for the given central laser
+wavelength (defined in \texttt{[medium]}) and
+\texttt{ionization\_potential}. The value of \texttt{generate} is the
+filename to which the rates are written (two-column data corresponding
+to the intensity [W/m$^2$] and rate [1/s]). The options for
+\texttt{formula} are \texttt{adk}, \texttt{mpi}, \texttt{tunnel},
+\texttt{yudin}, and \texttt{ilkov}.
+
+The rates can also be read from a file by defining the key
+\texttt{filename}. This file should contain two-column data
+corresponding to the intensity [W/m$^2$] and rate [1/s].
 
 Defining \texttt{[ionization]} also adds nonlinear absorption
 \[J_{\mathrm{NA}}(t) = \frac{W(E(t))}{I(t)} U_i \left(f\rho_{nt} -
