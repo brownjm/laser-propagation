@@ -502,14 +502,50 @@ and the distances at which they are written out is contained in
 \subsubsection{[kerr] (optional)}
 Defining this section adds Kerr nonlinearity to the simulation using
 \[P_{\mathrm{NL}}(r, t) = \epsilon_0 \chi^{(3)} E^3(r,t)\] where
-$\chi^{(3)} = \frac43 \epsilon_0 c n_2$. The only value to set is the
+$\chi^{(3)} = \frac43 \epsilon_0 c n_2 n_0^2$. The only value to set is the
 nonlinear coefficient $n_2$.
 \begin{lstlisting}
 [kerr]
-n2 = 20e-24
+n2 = 8e-24
 \end{lstlisting}
 Note: The value of $\chi^{(3)}$ is multiplied by the value of
 \texttt{pressure} that is set in section \texttt{[medium]}.
+
+\subsubsection{[ramankerr] (optional)}
+Defining this section add the Raman-Kerr nonlinearity to the
+simulation as:
+\[P_{\mathrm{NL}}(r,t) = \epsilon_0 \chi^{(3)} \left[(1-f_R) E^2(r,t)
+    + f_R\int_{-\infty}^t R(t-t') E^2(t')\right] E(r,t)\] where $f_R$
+is the Raman fraction, $R(t) = R_0 \exp(-\Gamma t/r) \sin(\Lambda t)$,
+$R_0 = (\Gamma^2/4 + \Lambda^2) / \Lambda$,
+$\chi^{(3)} = \frac43 \epsilon_0 c n_2 n_0^2$.  The required keys are
+\texttt{n2} for the nonlinear coefficient, \texttt{fraction} for the
+proportion of $n2$ associated with the delayed Raman response, and
+\texttt{gamma} \& \texttt{lambda} for the frequency parameters of
+$R(t)$.
+
+This equation is solved using the exponential time differencing
+method. The discrete formula for the time integration for array index
+$j$ from 0 to $Nt$ is
+\[P_{\mathrm{NL}}[j] = \epsilon_0 \chi^{(3)} \left[(1-f_R) E[j]^2 + f_R Q[j]\right] E[j] \]
+with an initial condition for $j = 0$
+\[Q[0] = R_0 \frac{\Delta t}{2} E[0]^2\]
+and for $j \ge 1$
+\[Q[j] = \Im\bigg\{e^{(-\Gamma/2 + i\Lambda)\Delta t} Q[j-1] + R_0\frac{\Delta t}{2} \left[E[j]^2 + e^{(-\Gamma/2 + i\Lambda)\Delta t} E[j-1]^2\right]\bigg\}\]
+
+An example of this section is:
+\begin{lstlisting}
+[ramankerr]
+n2 = 22.3e-24
+fraction = 0.65
+gamma = 10e12
+lambda 16e12
+\end{lstlisting}
+
+
+Note: the value of
+$\chi^{(3)}$ is multiplied by the value of \texttt{pressure} that is
+set in section \texttt{[medium]}.
 
 \subsubsection{[ionization] (optional)}
 Defining this section adds a rate of ionization which populates the
