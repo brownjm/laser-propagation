@@ -26,7 +26,7 @@ public:
       double Eold = E;
       for (std::size_t j = 1; j < time.size(); ++j) {
         E = electric_field(i, j).real();
-        R = std::imag(exp*Rold + eta * (std::pow(E, 2) + eta * std::pow(Eold, 2)));
+        R = std::imag(exp*Rold + eta * (std::pow(E, 2) + exp * std::pow(Eold, 2)));
         response(i, j) += Constants::epsilon_0 * chi3 * ((1 - fraction) * std::pow(E, 2)
                                                          + fraction * R) * E;
         Eold = E;
