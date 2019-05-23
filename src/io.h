@@ -11,6 +11,8 @@ namespace IO {
             std::vector<double>& z);
   
   void write(const std::string& filename, const std::vector<double>& data);
+  void write(const std::string& filename, const std::vector<double>& x,
+             const std::vector<double>& y);
   void write(const std::string& filename, const std::vector<double>& data,
 	     int Nrows, int Ncols);
   void write(const std::string& filename, const std::vector<std::complex<double>>& data,

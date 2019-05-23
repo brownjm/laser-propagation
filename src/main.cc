@@ -129,10 +129,7 @@ int main(int argc, char* argv[]) {
         }
 
         // write out rate
-        std::ofstream output(filename);
-        for (std::size_t i = 0; i < intensities.size(); ++i) {
-          output << intensities[i] << " " << rates[i] << "\n";
-        }
+        IO::write(filename, intensities, rates);
       }
       else {
         throw std::runtime_error("Section [ionization] must contain either 'filename' or 'generate'");

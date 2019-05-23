@@ -36,6 +36,17 @@ void IO::write(const std::string& filename, const std::vector<double>& data) {
   }
 }
 
+void IO::write(const std::string& filename, const std::vector<double>& x,
+               const std::vector<double>& y) {
+  std::ofstream output(filename);
+  if (!output) throw std::runtime_error("Cannot open output file: " + filename);
+  output.precision(std::numeric_limits<double>::max_digits10);
+  output << std::scientific;
+  for (std::size_t i = 0; i < x.size(); ++i) {
+    output << x[i] << " " << y[i] << "\n";
+  }
+}
+
 void IO::write(const std::string& filename, const std::vector<double>& data,
                int Nrows, int Ncols) {
   std::ofstream output(filename);
