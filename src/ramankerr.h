@@ -2,9 +2,9 @@
 
 class RamanKerr : public NonlinearResponse {
 public:
-  RamanKerr(double n2, double fraction, double gamma, double lambda, double pressure)
+  RamanKerr(double n2, double n0, double fraction, double gamma, double lambda, double pressure)
     :fraction(fraction), gamma(gamma), lambda(lambda) {
-    chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure;
+    chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure * std::pow(n0, 2);
     R0 = (std::pow(gamma, 2)/4.0 + std::pow(lambda, 2)) / lambda;
   }
 

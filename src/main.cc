@@ -71,15 +71,17 @@ int main(int argc, char* argv[]) {
     if (p.section_exists("kerr")) {
       double pressure = p.get<double>("medium/pressure");
       double n2 = p.get<double>("kerr/n2");
-      prop.add_polarization(std::make_unique<Kerr>(n2, pressure));
+      double n0 = p.get<double>("calculated/n0");
+      prop.add_polarization(std::make_unique<Kerr>(n2, n0, pressure));
     }
     else if (p.section_exists("ramankerr")) {
       double pressure = p.get<double>("medium/pressure");
       double n2 = p.get<double>("ramankerr/n2");
+      double n0 = p.get<double>("calculated/n0");
       double fraction = p.get<double>("ramankerr/fraction");
       double gamma = p.get<double>("gamma");
       double lambda = p.get<double>("lambda");
-      prop.add_polarization(std::make_unique<RamanKerr>(n2, fraction, gamma, lambda, pressure));
+      prop.add_polarization(std::make_unique<RamanKerr>(n2, n0, fraction, gamma, lambda, pressure));
     }
     
     if (p.section_exists("ionization")) {

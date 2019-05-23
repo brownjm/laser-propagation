@@ -2,8 +2,8 @@
 
 class Kerr : public NonlinearResponse {
 public:
-  Kerr(double n2, double pressure) {
-    chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure;
+  Kerr(double n2, double n0, double pressure) {
+    chi3 = 4.0/3.0 * Constants::epsilon_0 * Constants::c * n2 * pressure * std::pow(n0, 2);
   }
 
   void calculate(const std::vector<double>& radius,
