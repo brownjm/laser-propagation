@@ -79,15 +79,15 @@ int main(int argc, char* argv[]) {
       double n2 = p.get<double>("ramankerr/n2");
       double n0 = p.get<double>("calculated/n0");
       double fraction = p.get<double>("ramankerr/fraction");
-      double gamma = p.get<double>("gamma");
-      double lambda = p.get<double>("lambda");
+      double gamma = p.get<double>("ramankerr/gamma");
+      double lambda = p.get<double>("ramankerr/lambda");
       prop.add_polarization(std::make_unique<RamanKerr>(n2, n0, fraction, gamma, lambda, pressure));
     }
     
     if (p.section_exists("ionization")) {
       std::string filename;
-      if (p.key_exists("ionization/filename")) {
-        filename = p.get<std::string>("ionization/filename");
+      if (p.key_exists("ionization/read")) {
+        filename = p.get<std::string>("ionization/read");
       } else if (p.key_exists("ionization/generate")) {
         filename = p.get<std::string>("ionization/generate");
         std::string formula = p.get<std::string>("ionization/formula");
@@ -219,8 +219,14 @@ void initialize_laser_field(Propagator& prop, Parameters::Parameters& p) {
   double Pin = Constants::pi * std::pow(waist, 2) * I0 / 2;
   p.set("calculated/Pin", Pin);
 
-  if (p.section_exists("kerr") || p.section_exists("ramankerr")) {
+  if (p.section_exists("kerr")) {
     double n2 = p.get<double>("kerr/n2");
+    double k0 = 2*Constants::pi / wavelength;
+    double Pcr = 3.77*Constants::pi*n0 / (2*std::pow(k0, 2) * n2);
+    p.set("calculated/Pcr", Pcr);
+  }
+  if (p.section_exists("ramankerr")) {
+    double n2 = p.get<double>("ramankerr/n2");
     double k0 = 2*Constants::pi / wavelength;
     double Pcr = 3.77*Constants::pi*n0 / (2*std::pow(k0, 2) * n2);
     p.set("calculated/Pcr", Pcr);
