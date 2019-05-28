@@ -1,11 +1,11 @@
 #ifndef TIME_H_
 #define TIME_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Time : public Observer {
+  class Time : public Result {
   public:
     Time(const std::string& filename)
       :filename(filename) {}

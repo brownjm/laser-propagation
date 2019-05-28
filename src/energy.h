@@ -3,11 +3,11 @@
 
 #include <string>
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-class Energy : public Observer {
+class Energy : public Result {
 public:
   Energy(const std::string& filename);
   void notify(int current_step, double current_distance,

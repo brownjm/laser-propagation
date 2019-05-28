@@ -54,7 +54,7 @@ collision_time = 350e-15
 ionization_potential = 1.933779e-18
 
 
-[output]
+[results]
 temporal_field = E
 spectral_field = A
 electron_density = Rho

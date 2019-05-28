@@ -1,11 +1,11 @@
 #ifndef KZ_H_
 #define KZ_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Kz : public Observer {
+  class Kz : public Result {
   public:
     Kz(const std::string& filename)
       :filename(filename) {}

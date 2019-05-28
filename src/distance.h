@@ -1,11 +1,11 @@
 #ifndef DISTANCE_H_
 #define DISTANCE_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Distance : public Observer {
+  class Distance : public Result {
   public:
     Distance(const std::string& filename);
     void notify(int current_step, double current_distance,

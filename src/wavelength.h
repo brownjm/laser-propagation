@@ -1,11 +1,11 @@
 #ifndef WAVELENGTH_H_
 #define WAVELENGTH_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Wavelength : public Observer {
+  class Wavelength : public Result {
   public:
     Wavelength(const std::string& filename)
       :filename(filename) {}

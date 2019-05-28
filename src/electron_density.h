@@ -1,11 +1,11 @@
 #ifndef ELECTRON_DENSITY_H_
 #define ELECTRON_DENSITY_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class ElectronDensity : public Observer {
+  class ElectronDensity : public Result {
   public:
     ElectronDensity(const std::string& filename);
     void notify(int current_step, double current_distance,

@@ -1,7 +1,7 @@
 #include "temporal_field.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   TemporalField::TemporalField(const std::string& fn)
     :number(0), filename(fn) {}

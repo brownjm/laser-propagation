@@ -1,11 +1,11 @@
 #ifndef SPECTRAL_FILTER_H_
 #define SPECTRAL_FILTER_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class SpectralFilter : public Observer {
+  class SpectralFilter : public Result {
   public:
     SpectralFilter(const std::string& filename)
       :filename(filename) {}

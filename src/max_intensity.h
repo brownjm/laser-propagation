@@ -1,11 +1,11 @@
 #ifndef MAX_INTENSITY_H_
 #define MAX_INTENSITY_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-class MaxIntensity : public Observer {
+class MaxIntensity : public Result {
 public:
   MaxIntensity(const std::string& filename);
   void notify(int current_step, double current_distance,

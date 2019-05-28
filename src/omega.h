@@ -1,11 +1,11 @@
 #ifndef OMEGA_H_
 #define OMEGA_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Omega : public Observer {
+  class Omega : public Result {
   public:
     Omega(const std::string& filename)
       :filename(filename) {}

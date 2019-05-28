@@ -58,7 +58,7 @@ density_of_neutrals = 2.5e25
 collision_time = 190e-15
 ionization_potential = 2.5250303e-18
 
-[output]
+[results]
 temporal_field = E
 spectral_field = A
 electron_density = Rho

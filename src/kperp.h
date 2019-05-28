@@ -1,11 +1,11 @@
 #ifndef KPERP_H_
 #define KPERP_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Kperp : public Observer {
+  class Kperp : public Result {
   public:
     Kperp(const std::string& filename)
       :filename(filename) {}

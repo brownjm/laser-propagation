@@ -1,11 +1,11 @@
 #ifndef INDEX_H_
 #define INDEX_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Index : public Observer {
+  class Index : public Result {
   public:
     Index(const std::string& filename)
       :filename(filename) {}

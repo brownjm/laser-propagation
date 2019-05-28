@@ -1,7 +1,7 @@
 #include "distance.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   Distance::Distance(const std::string& fn)
     :filename(fn) {

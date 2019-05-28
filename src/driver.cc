@@ -5,7 +5,7 @@
 #include "io.h"
 #include "driver.h"
 #include "propagator.h"
-#include "observer.h"
+#include "result.h"
 #include "util.h"
 #include "timer.h"
 
@@ -13,12 +13,12 @@
 Driver::Driver(Propagator& prop)
   :current_step(0), current_distance(0), propagator(prop) {}
 
-void Driver::add_observer(std::unique_ptr<Observers::Observer> obs, ObserverType obstype) {
-  if (obstype == ObserverType::Once) {
+void Driver::add_result(std::unique_ptr<Results::Result> obs, ResultType result_type) {
+  if (result_type == ResultType::Once) {
     once.push_back(std::move(obs));
-  } else if (obstype == ObserverType::Cheap) {
+  } else if (result_type == ResultType::Cheap) {
     cheap.push_back(std::move(obs));
-  } else if (obstype == ObserverType::Expensive) {
+  } else if (result_type == ResultType::Expensive) {
     expensive.push_back(std::move(obs));
   }
 }

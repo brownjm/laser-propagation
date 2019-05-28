@@ -2,7 +2,7 @@
 #include "util.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   Energy::Energy(const std::string& fn)
     :filename(fn) {

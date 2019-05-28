@@ -1,11 +1,11 @@
 #ifndef RADIUS_H_
 #define RADIUS_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Radius : public Observer {
+  class Radius : public Result {
   public:
     Radius(const std::string& filename)
       :filename(filename) {}

@@ -1,11 +1,11 @@
 #ifndef HANKEL_H_
 #define HANKEL_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Hankel : public Observer {
+  class Hankel : public Result {
   public:
     Hankel(const std::string& filename)
       :filename(filename) {}

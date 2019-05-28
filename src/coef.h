@@ -1,11 +1,11 @@
 #ifndef COEF_H_
 #define COEF_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Coef : public Observer {
+  class Coef : public Result {
   public:
     Coef(const std::string& filename)
       :filename(filename) {}

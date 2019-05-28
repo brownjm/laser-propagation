@@ -5,16 +5,16 @@
 #include <memory>
 
 class Propagator;
-namespace Observers {
-  class Observer;
+namespace Results {
+  class Result;
 }
 
-enum class ObserverType {Once, Cheap, Expensive};
+enum class ResultType {Once, Cheap, Expensive};
 
 class Driver {
 public:
   Driver(Propagator& propagator);
-  void add_observer(std::unique_ptr<Observers::Observer> obs, ObserverType obstype);
+  void add_result(std::unique_ptr<Results::Result> obs, ResultType obstype);
   void run(double start_distance, double end_distance, int steps_cheap, int steps_expensive);
 
 private:
@@ -23,7 +23,7 @@ private:
   
   Propagator& propagator;
 
-  std::vector<std::unique_ptr<Observers::Observer>> once, cheap, expensive;
+  std::vector<std::unique_ptr<Results::Result>> once, cheap, expensive;
   void notify_once();
   void notify_cheap();
   void notify_expensive();

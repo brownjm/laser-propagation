@@ -2,7 +2,7 @@
 #include "util.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   MaxIntensity::MaxIntensity(const std::string& fn)
     :filename(fn) {

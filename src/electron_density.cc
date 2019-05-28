@@ -1,7 +1,7 @@
 #include "electron_density.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   ElectronDensity::ElectronDensity(const std::string& fn)
     :number(0), filename(fn) {}

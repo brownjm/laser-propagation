@@ -463,13 +463,13 @@ and \texttt{[space]}.
 
 
 \subsection{Output data}
-\subsubsection{[output] (optional)}
+\subsubsection{[results] (optional)}
 This section defines which data is written to which files during
 propagation.  All of the entries in this section are
 optional. Commenting or removing any line below results in no data
 being written for that particular item.
 \begin{lstlisting}
-[output]
+[results]
 # field and density filename patterns and their associated distances
 temporal_field = E
 spectral_field = A
@@ -550,7 +550,7 @@ set in section \texttt{[medium]}.
 \subsubsection{[ionization] (optional)}
 Defining this section adds a rate of ionization which populates the
 electron density $\rho(r,t)$ at each step of the simulation according to
-\[\frac{\partial \rho}{\partial t} = W(E(t)) (\rho_{nt}-\rho)\]
+\[\frac{\partial \rho}{\partial t} = W(E(t)) (f\rho_{nt}-\rho)\]
 where $W$ is the rate of ionization and $\rho_{nt}$ is the
 \texttt{density\_of\_neutrals}.  This equation is solved using the
 exponential time differencing method

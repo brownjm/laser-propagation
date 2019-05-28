@@ -1,11 +1,11 @@
 #ifndef TEMPORAL_FIELD_H_
 #define TEMPORAL_FIELD_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class TemporalField : public Observer {
+  class TemporalField : public Result {
   public:
     TemporalField(const std::string& filename);
     void notify(int current_step, double current_distance,

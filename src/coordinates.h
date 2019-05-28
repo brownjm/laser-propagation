@@ -1,11 +1,11 @@
 #ifndef COORDINATES_H_
 #define COORDINATES_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class Coordinates : public Observer {
+  class Coordinates : public Result {
   public:
     Coordinates(const std::string& filename_time,
 		const std::string& filename_radius,

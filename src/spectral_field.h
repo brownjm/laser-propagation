@@ -1,11 +1,11 @@
 #ifndef SPECTRAL_FIELD_H_
 #define SPECTRAL_FIELD_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class SpectralField : public Observer {
+  class SpectralField : public Result {
   public:
     SpectralField(const std::string& filename);
     void notify(int current_step, double current_distance,

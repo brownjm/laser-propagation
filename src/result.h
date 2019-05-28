@@ -1,22 +1,22 @@
-#ifndef OBSERVER_H_
-#define OBSERVER_H_
+#ifndef RESULT_H_
+#define RESULT_H_
 
 
 #include "simulation_data.h"
 
-namespace Observers {
+namespace Results {
 
-class Observer {
+class Result {
 public:
-  // all observers will receive these parameters at intervals
+  // all Result objects will receive these parameters at intervals
   virtual void notify(int current_step, double current_distance,
                       const SimulationData& data) = 0;
 
-  // signals to the observers to perform a final computation,
+  // signals to the Result object to perform a final computation,
   // such as write their results to a file
   virtual void finalize() = 0;
 };
 
 }
 
-#endif // OBSERVER_H_
+#endif // RESULT_H_

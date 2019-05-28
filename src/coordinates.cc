@@ -1,7 +1,7 @@
 #include "coordinates.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   Coordinates::Coordinates(const std::string& filename_time,
 			  const std::string& filename_radius,

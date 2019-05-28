@@ -1,11 +1,11 @@
 #ifndef MAX_DENSITY_H_
 #define MAX_DENSITY_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-class MaxDensity : public Observer {
+class MaxDensity : public Result {
 public:
   MaxDensity(const std::string& filename);
   void notify(int current_step, double current_distance,

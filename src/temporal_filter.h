@@ -1,11 +1,11 @@
 #ifndef TEMPORAL_FILTER_H_
 #define TEMPORAL_FILTER_H_
 
-#include "observer.h"
+#include "result.h"
 
-namespace Observers {
+namespace Results {
 
-  class TemporalFilter : public Observer {
+  class TemporalFilter : public Result {
   public:
     TemporalFilter(const std::string& filename)
       :filename(filename) {}

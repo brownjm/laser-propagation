@@ -1,7 +1,7 @@
 #include "time.h"
 #include "io.h"
 
-namespace Observers {
+namespace Results {
 
   Time::Time(const std::string& fn)
     :filename(fn) {}
