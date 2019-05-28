@@ -13,6 +13,8 @@
 #include "ramankerr.h"
 #include "plasma.h"
 #include "nonlinear_absorption.h"
+#include "generate_rate.h"
+#include "tabulated_rate.h"
 
 template <typename T> std::string type_name();
 
@@ -139,9 +141,9 @@ int main(int argc, char* argv[]) {
       double pressure = p.get<double>("medium/pressure");
       double fraction = p.get<double>("ionization/ionizing_fraction");
 
-      auto ioniz = std::make_shared<Ionization>(filename, density_of_neutrals, pressure,
-                                                fraction);
-      prop.add_ionization(std::move(ioniz));
+      auto ioniz = std::make_shared<TabulatedRate>(filename, density_of_neutrals, pressure,
+                                                   fraction);
+      prop.add_ionization(ioniz);
       prop.calculate_electron_density();
 
 

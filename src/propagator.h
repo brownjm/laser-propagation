@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <functional>
+#include <memory>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv2.h>
 #include "field.h"

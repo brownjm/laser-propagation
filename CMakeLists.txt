@@ -14,7 +14,8 @@ add_executable(main.out
   src/gaussian.cc
   src/fromfile.cc
   src/parameters.cc
-  src/ionization.cc
+  src/tabulated_rate.cc
+  src/generate_rate.cc
   src/interpolate.cc
   src/util.cc
   src/medium.cc
