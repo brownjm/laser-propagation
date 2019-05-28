@@ -30,9 +30,9 @@ public:
   void initialize_filters(double time_filter_min, double time_filter_max,
                           double wave_filter_min, double wave_filter_max);
 
-  void add_polarization(std::unique_ptr<NonlinearResponse> P);
-  void add_current(std::unique_ptr<NonlinearResponse> J);
-  void add_ionization(std::unique_ptr<Ionization> ioniz);
+  void add_polarization(std::shared_ptr<NonlinearResponse> P);
+  void add_current(std::shared_ptr<NonlinearResponse> J);
+  void add_ionization(std::shared_ptr<Ionization> ioniz);
   
   void linear_step(Radial& radial, double dz);
   void linear_step(std::complex<double>* A, double dz);
@@ -52,10 +52,10 @@ public:
   std::vector<std::complex<double>> index;
   Array2D<std::complex<double>> kz, coef, A;
 
-  std::vector<std::unique_ptr<NonlinearResponse>> polarization_responses;
-  std::vector<std::unique_ptr<NonlinearResponse>> current_responses;
+  std::vector<std::shared_ptr<NonlinearResponse>> polarization_responses;
+  std::vector<std::shared_ptr<NonlinearResponse>> current_responses;
   Radial workspace1, workspace2;
-  std::unique_ptr<Ionization> ionization;
+  std::shared_ptr<Ionization> ionization;
   
   // ode solver
   double current_distance, step;

@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
       double pressure = p.get<double>("medium/pressure");
       double n2 = p.get<double>("kerr/n2");
       double n0 = p.get<double>("calculated/n0");
-      prop.add_polarization(std::make_unique<Kerr>(n2, n0, pressure));
+      prop.add_polarization(std::make_shared<Kerr>(n2, n0, pressure));
     }
     else if (p.section_exists("ramankerr")) {
       double pressure = p.get<double>("medium/pressure");
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
       double fraction = p.get<double>("ramankerr/fraction");
       double gamma = p.get<double>("ramankerr/gamma");
       double lambda = p.get<double>("ramankerr/lambda");
-      prop.add_polarization(std::make_unique<RamanKerr>(n2, n0, fraction, gamma, lambda, pressure));
+      prop.add_polarization(std::make_shared<RamanKerr>(n2, n0, fraction, gamma, lambda, pressure));
     }
     
     if (p.section_exists("ionization")) {
@@ -139,17 +139,17 @@ int main(int argc, char* argv[]) {
       double pressure = p.get<double>("medium/pressure");
       double fraction = p.get<double>("ionization/ionizing_fraction");
 
-      auto ioniz = std::make_unique<Ionization>(filename, density_of_neutrals, pressure,
+      auto ioniz = std::make_shared<Ionization>(filename, density_of_neutrals, pressure,
                                                 fraction);
       prop.add_ionization(std::move(ioniz));
       prop.calculate_electron_density();
 
 
       double collision_time = p.get<double>("ionization/collision_time");
-      prop.add_current(std::make_unique<Plasma>(collision_time, pressure));
+      prop.add_current(std::make_shared<Plasma>(collision_time, pressure));
 
       double ionization_potential = p.get<double>("ionization/ionization_potential");
-      prop.add_current(std::make_unique<NonlinearAbsorption>(ionization_potential,
+      prop.add_current(std::make_shared<NonlinearAbsorption>(ionization_potential,
                                                              density_of_neutrals,
                                                              pressure, fraction,
                                                              prop.ionization_rate));

@@ -145,16 +145,16 @@ void Propagator::initialize_filters(double time_filter_min, double time_filter_m
 }
 
 
-void Propagator::add_polarization(std::unique_ptr<NonlinearResponse> polarization) {
-  polarization_responses.push_back(std::move(polarization));
+void Propagator::add_polarization(std::shared_ptr<NonlinearResponse> polarization) {
+  polarization_responses.push_back(polarization);
 }
 
-void Propagator::add_current(std::unique_ptr<NonlinearResponse> current) {
-  current_responses.push_back(std::move(current));
+void Propagator::add_current(std::shared_ptr<NonlinearResponse> current) {
+  current_responses.push_back(current);
 }
 
-void Propagator::add_ionization(std::unique_ptr<Ionization> ioniz) {
-  ionization = std::move(ioniz);
+void Propagator::add_ionization(std::shared_ptr<Ionization> ioniz) {
+  ionization = ioniz;
 }
 
 void Propagator::linear_step(Radial& radial, double dz) {
