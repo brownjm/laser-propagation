@@ -1,20 +1,17 @@
 """Plot the maximum electron density along propagation"""
-import sys
+import argparse
 import matplotlib.pyplot as plt
-plt.rcParams['figure.dpi'] = 200
-plt.close('all')
-
 import load
-
 
 def plot(input_file):
     r = load.Results(input_file)
     z, density = r.max_electron_density()
+    cm = z * 100
 
     fig, ax = plt.subplots()
-    ax.plot(z, density)
+    ax.plot(cm, density)
 
-    ax.set_xlabel('distance [m]')
+    ax.set_xlabel('distance [cm]')
     ax.set_ylabel('electron density [1/m^3]')
     ax.set_yscale('log')
     fig.tight_layout()
@@ -23,9 +20,8 @@ def plot(input_file):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Please provide an input file")
-        sys.exit()
+    parser = argparse.ArgumentParser(description='Plot the maximum electron density along propagation')
+    parser.add_argument('input_file', help='input file from simulation')
 
-    input_file = sys.argv[1]
-    plot(input_file)
+    args = parser.parse_args()
+    plot(args.input_file)

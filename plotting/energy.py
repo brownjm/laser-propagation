@@ -1,22 +1,18 @@
-"""Plot the energy along propagation"""
-import sys
+"""Plot the laser pulse energy along propagation"""
+import argparse
 import matplotlib.pyplot as plt
-plt.rcParams['figure.dpi'] = 200
-plt.close('all')
-
 import load
-
 
 def plot(input_file):
     r = load.Results(input_file)
     z, energy = r.energy()
-
+    cm = z * 100
     energy_mJ = energy * 1e3
     
     fig, ax = plt.subplots()
-    ax.plot(z, energy_mJ)
-
-    ax.set_xlabel('distance [m]')
+    ax.plot(cm, energy_mJ)
+    
+    ax.set_xlabel('distance [cm]')
     ax.set_ylabel('energy [mJ]')
     fig.tight_layout()
 
@@ -24,9 +20,8 @@ def plot(input_file):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Please provide an input file")
-        sys.exit()
+    parser = argparse.ArgumentParser(description='Plot the laser pulse energy along propagation')
+    parser.add_argument('input_file', help='input file from simulation')
 
-    input_file = sys.argv[1]
-    plot(input_file)
+    args = parser.parse_args()
+    plot(args.input_file)
