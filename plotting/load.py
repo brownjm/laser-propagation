@@ -14,18 +14,18 @@ class Results:
         self.config = load_config(filename)
         self.folder = self.config['folder']
 
-        self.distances = load(join(self.folder, self.config['output/distance']))
-        self.time = load(join(self.folder, self.config['output/time']))
-        self.radius = load(join(self.folder, self.config['output/radius']))
-        self.omega = load(join(self.folder, self.config['output/omega']))
-        self.wavelength = load(join(self.folder, self.config['output/wavelength']))
-        self.kperp = load(join(self.folder, self.config['output/kperp']))
+        self.distances = load(join(self.folder, self.config['results/distance']))
+        self.time = load(join(self.folder, self.config['results/time']))
+        self.radius = load(join(self.folder, self.config['results/radius']))
+        self.omega = load(join(self.folder, self.config['results/omega']))
+        self.wavelength = load(join(self.folder, self.config['results/wavelength']))
+        self.kperp = load(join(self.folder, self.config['results/kperp']))
 
 
     def electric_field(self, requested_distance):
         """Returns the closest distance and electric field"""
         i = self._find_nearest(requested_distance)
-        filename = self._make_filename(self.config['output/temporal_field'], i)
+        filename = self._make_filename(self.config['results/temporal_field'], i)
         E = load_binary(filename, len(self.radius), len(self.time))
         z = self.distances[i]
         return z, E
@@ -34,7 +34,7 @@ class Results:
     def electron_density(self, requested_distance):
         """Returns the closest distance and electron density"""
         i = self._find_nearest(requested_distance)
-        filename = self._make_filename(self.config['output/electron_density'], i)
+        filename = self._make_filename(self.config['results/electron_density'], i)
         Rho = load_binary(filename, len(self.radius), len(self.time), dtype=float)
         z = self.distances[i]
         return z, Rho
@@ -43,7 +43,7 @@ class Results:
     def spectral_field(self, requested_distance):
         """Return the closest distance and spectral field"""
         i = self._find_nearest(requested_distance)
-        filename = self._make_filename(self.config['output/spectral_field'], i)
+        filename = self._make_filename(self.config['results/spectral_field'], i)
         A = load_binary(filename, len(self.kperp), len(self.omega))
         z = self.distances[i]
         return z, A
@@ -52,7 +52,7 @@ class Results:
     def spectrum(self, requested_distance):
         """Returns the closest distance and spectrum"""
         i = self._find_nearest(requested_distance)
-        filename = self._make_filename(self.config['output/spectral_field'], i)
+        filename = self._make_filename(self.config['results/spectral_field'], i)
         A = load_binary(filename, len(self.kperp), len(self.omega))
         z = self.distances[i]
 
@@ -82,19 +82,19 @@ class Results:
     
     def energy(self):
         """Returns the distances and energy values along propagation"""
-        z, energies = load(join(self.folder, self.config['output/energy']))
+        z, energies = load(join(self.folder, self.config['results/energy']))
         return z, energies
 
 
     def max_intensity(self):
         """Returns the distances and maximum intensity values along propagation"""
-        z, maxI = load(join(self.folder, self.config['output/max_intensity']))
+        z, maxI = load(join(self.folder, self.config['results/max_intensity']))
         return z, maxI
 
     
     def max_electron_density(self):
         """Returns the distances and maximum electron density values along propagation"""
-        z, max_den = load(join(self.folder, self.config['output/max_density']))
+        z, max_den = load(join(self.folder, self.config['results/max_density']))
         return z, max_den
     
     
