@@ -155,6 +155,7 @@ void Propagator::add_current(std::shared_ptr<NonlinearResponse> current) {
 
 void Propagator::add_ionization(std::shared_ptr<Ionization> ioniz) {
   ionization = ioniz;
+  calculate_electron_density();
 }
 
 void Propagator::linear_step(Radial& radial, double dz) {
