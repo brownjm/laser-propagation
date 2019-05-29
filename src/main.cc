@@ -176,15 +176,15 @@ int main(int argc, char* argv[]) {
       prop.add_polarization(argon);
 
       // add plasma effects
-      // double collision_time = p.get<double>("argon/collision_time");
-      // prop.add_current(std::make_shared<Plasma>(collision_time, pressure));
+      double collision_time = p.get<double>("argon/collision_time");
+      prop.add_current(std::make_shared<Plasma>(collision_time, pressure));
 
       // // add absorption from ionization
-      // double ionization_potential = p.get<double>("argon/ionization_potential");
-      // prop.add_current(std::make_shared<NonlinearAbsorption>(ionization_potential,
-      //                                                        density_of_neutrals,
-      //                                                        pressure, 1,
-      //                                                        prop.ionization_rate));
+      double ionization_potential = p.get<double>("argon/ionization_potential");
+      prop.add_current(std::make_shared<NonlinearAbsorption>(ionization_potential,
+                                                             density_of_neutrals,
+                                                             pressure, 1,
+                                                             prop.ionization_rate));
     }
 
     Driver driver(prop);
