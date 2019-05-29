@@ -235,8 +235,8 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   // calculate contributions from nonlinear polarizations Pnl(r, t)
   std::fill(std::begin(workspace1.temporal.values), std::end(workspace1.temporal.values), 0);
   for (auto& source : polarization_responses) {
-    source->calculate(field.radius, field.time, field.temporal, electron_density,
-                      workspace1.temporal);
+    source->calculate_response(field.radius, field.time, field.temporal, electron_density,
+                               workspace1.temporal);
   }
   // transform Pnl(r, t) -> Pnl(r, omega)
   workspace1.backward_fft();
@@ -244,8 +244,8 @@ void Propagator::calculate_rhs(double z, const std::complex<double>* A, std::com
   // calculate contributions from nonlinear currents Jnl(r, t)
   std::fill(std::begin(workspace2.temporal.values), std::end(workspace2.temporal.values), 0);
   for (auto& source : current_responses) {
-    source->calculate(field.radius, field.time, field.temporal, electron_density,
-                      workspace2.temporal);
+    source->calculate_response(field.radius, field.time, field.temporal, electron_density,
+                               workspace2.temporal);
   }
   // transform Jnl(r, t) -> Jnl(r, omega)
   workspace2.backward_fft();

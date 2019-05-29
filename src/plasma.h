@@ -6,11 +6,11 @@ public:
     : collision_time(collision / pressure) {}
 
 
-  void calculate(const std::vector<double>& radius,
-                 const std::vector<double>& time,
-                 const Array2D<std::complex<double>>& electric_field,
-                 const Array2D<double>& electron_density,
-                 Array2D<std::complex<double>>& response) override {
+  void calculate_response(const std::vector<double>& radius,
+                          const std::vector<double>& time,
+                          const Array2D<std::complex<double>>& electric_field,
+                          const Array2D<double>& electron_density,
+                          Array2D<std::complex<double>>& response) override {
     // integrate dJ/dt + J(t)/tau_c = e^2/m * rho(t) E(t)
     // using the exponential time differencing method:
     // S.M. Cox, P.C. Matthews, J. Comp. Phys. 176, 430 (2002)

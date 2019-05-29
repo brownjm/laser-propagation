@@ -13,11 +13,11 @@ public:
   // its values to response(i,j) where the indices (i, j) correspond
   // to (radius, time)
   // e.g. response(i,j) += func(electric_field(i,j).real());
-  virtual void calculate(const std::vector<double>& radius,
-                         const std::vector<double>& time,
-                         const Array2D<std::complex<double>>& electric_field,
-                         const Array2D<double>& electron_density,
-                         Array2D<std::complex<double>>& response) = 0;
+  virtual void calculate_response(const std::vector<double>& radius,
+                                  const std::vector<double>& time,
+                                  const Array2D<std::complex<double>>& electric_field,
+                                  const Array2D<double>& electron_density,
+                                  Array2D<std::complex<double>>& response) = 0;
 };
 
 #endif // NONLINEAR_RESPONSE

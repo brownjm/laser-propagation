@@ -8,11 +8,11 @@ public:
     R0 = (std::pow(gamma, 2)/4.0 + std::pow(lambda, 2)) / lambda;
   }
 
-  void calculate(const std::vector<double>& radius,
-                 const std::vector<double>& time,
-                 const Array2D<std::complex<double>>& electric_field,
-                 const Array2D<double>&,
-                 Array2D<std::complex<double>>& response) override {
+  void calculate_response(const std::vector<double>& radius,
+                          const std::vector<double>& time,
+                          const Array2D<std::complex<double>>& electric_field,
+                          const Array2D<double>&,
+                          Array2D<std::complex<double>>& response) override {
     double dt = time[1] - time[0];
     std::complex<double> imagi(0, 1);
     std::complex<double> exp = std::exp((-gamma/2.0 + imagi*lambda) * dt);
