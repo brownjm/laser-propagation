@@ -34,6 +34,13 @@ void ArgonResponse::calculate_electron_density(const Radial& electric_field,
     argon.reset_to_ground_state();
     argon.calculate_dipole_ionization(field_atomic, field_atomic_dt, atomic_dt,
                                       dipole_atomic, probability_free);
+    // force free electron probability to be constant or monotonically increasing
+    for (int j = 1; j < Nt; ++j) {
+      if (probability_free[j] < probability_free[j-1]) {
+        probability_free[j] = probability_free[j-1];
+      }
+    }
+    
     for (int j = 0; j < Nt; ++j) {
       electron_density(i, j) = density_of_neutrals * probability_free[j];
       dipole(i, j) = dipole_atomic[j];
