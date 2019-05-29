@@ -15,6 +15,7 @@
 #include "nonlinear_absorption.h"
 #include "generate_rate.h"
 #include "tabulated_rate.h"
+#include "argon_response.h"
 
 template <typename T> std::string type_name();
 
@@ -144,8 +145,6 @@ int main(int argc, char* argv[]) {
       auto ioniz = std::make_shared<TabulatedRate>(filename, density_of_neutrals, pressure,
                                                    fraction);
       prop.add_ionization(ioniz);
-      prop.calculate_electron_density();
-
 
       double collision_time = p.get<double>("ionization/collision_time");
       prop.add_current(std::make_shared<Plasma>(collision_time, pressure));
@@ -155,6 +154,37 @@ int main(int argc, char* argv[]) {
                                                              density_of_neutrals,
                                                              pressure, fraction,
                                                              prop.ionization_rate));
+    }
+    if (p.section_exists("argon")) {
+      int Nr = p.get<int>("argon/Nr");
+      int Nl = p.get<int>("argon/Nl");
+      int Nmask = p.get<int>("argon/Nmask");
+      std::string filename = p.get<std::string>("argon/potential");
+      int ionization_box_size = p.get<int>("argon/ionization_box_size");
+      double atomic_dt = p.get<double>("argon/step_size");
+      int Nradius = p.get<int>("space/N");
+      int Ntime = p.get<int>("time/N");
+      double density_of_neutrals = p.get<double>("argon/density_of_neutrals");
+      double pressure = p.get<double>("medium/pressure");
+      auto argon = std::make_shared<ArgonResponse>(Nr, Nl, Nmask, filename,
+                                                   ionization_box_size,
+                                                   Nradius, Ntime, atomic_dt,
+                                                   density_of_neutrals*pressure);
+
+      // calculate ionization and nonlinear polarization using Argon
+      prop.add_ionization(argon);
+      prop.add_polarization(argon);
+
+      // add plasma effects
+      // double collision_time = p.get<double>("argon/collision_time");
+      // prop.add_current(std::make_shared<Plasma>(collision_time, pressure));
+
+      // // add absorption from ionization
+      // double ionization_potential = p.get<double>("argon/ionization_potential");
+      // prop.add_current(std::make_shared<NonlinearAbsorption>(ionization_potential,
+      //                                                        density_of_neutrals,
+      //                                                        pressure, 1,
+      //                                                        prop.ionization_rate));
     }
 
     Driver driver(prop);

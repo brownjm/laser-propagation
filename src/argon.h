@@ -1,9 +1,9 @@
-#ifndef PROPAGATOR_H_
-#define PROPAGATOR_H_
+#ifndef ARGON_H_
+#define ARGON_H_
 
 #include <complex>
 #include <vector>
-#include "array.h"
+#include "array2d.h"
 
 typedef std::complex<double> complex;
 
@@ -58,4 +58,4 @@ void read_potential(const std::string& filename,
                     std::vector<double>& potl0, std::vector<double>& potl1,
                     std::vector<double>& potl2);
 
-#endif // PROPAGATOR_H_
+#endif // ARGON_H_

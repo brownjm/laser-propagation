@@ -28,6 +28,8 @@ add_executable(main.out
   src/coordinates.cc
   src/max_density.cc
   src/electron_density.cc
+  src/argon.cc
+  src/argon_response.cc
   )
 
 target_compile_options(main.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
