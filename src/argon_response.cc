@@ -1,5 +1,6 @@
 #include "argon_response.h"
 #include "argon.h"
+#include "radial.h"
 #include "io.h"
 
 ArgonResponse::ArgonResponse(int Nr, int Nl, int Nmask,
