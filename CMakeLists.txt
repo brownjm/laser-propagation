@@ -5,6 +5,7 @@ find_package(GSL REQUIRED)
 find_package(FFTW REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+# single threaded executable
 add_executable(main.out
   src/main.cc
   src/driver.cc
@@ -34,3 +35,37 @@ add_executable(main.out
 
 target_compile_options(main.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
 target_link_libraries(main.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES} Eigen3::Eigen)
+
+# MPI executable
+find_package(MPI REQUIRED)
+add_executable(main-mpi.out
+  src/main-mpi.cc
+  src/driver.cc
+  src/propagator.cc
+  src/radial.cc
+  src/io.cc
+  src/gaussian.cc
+  src/fromfile.cc
+  src/parameters.cc
+  src/tabulated_rate.cc
+  src/generate_rate.cc
+  src/interpolate.cc
+  src/util.cc
+  src/medium.cc
+  src/linear.cc
+  src/distance.cc
+  src/energy.cc
+  src/temporal_field.cc
+  src/spectral_field.cc
+  src/max_intensity.cc
+  src/coordinates.cc
+  src/max_density.cc
+  src/electron_density.cc
+  src/argon.cc
+  src/argon_response_pool.cc
+  src/argon_response_worker.cc
+  )
+
+target_compile_options(main-mpi.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
+target_link_libraries(main-mpi.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES}
+  Eigen3::Eigen ${MPI_LIBRARIES} MPI::MPI_CXX)
