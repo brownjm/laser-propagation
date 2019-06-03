@@ -590,13 +590,75 @@ collision_time = 190e-15
 ionization_potential = 2.5250303e-18
 \end{lstlisting}
 
-\subsubsection{[quantum] (optional)}
-Experimental, quantum argon based on Ken's length gauge model. When
-adding this section its necessary to compile the program with support
-for MPI.
+\subsubsection{[argon] (optional)}
+\textbf{This is an experimental feature!} Adding the section
+\texttt{[argon]} to the parameter file initializes a realistic SAE
+model for argon. This model is based on the work from ``Calculations
+of strong field multiphoton processes\ldots'', Schafer et al., AIP
+Conf. Proc. \textbf{525}, 45 (2000).
 
-\section{Extending}
-\subsection{Adding new linear medium}
-\subsection{Adding new nonlinearities}
+There is an atom placed at each radial point, so the number of quantum
+systems in the simulation is equal to the value of \texttt{N} in
+\texttt{[space]}. The time-dependent nonlinear polarization (from the
+dipole moment) and ionization probability are computed for each atom
+as it interacts with the laser field.
+
+Since the time to compute the response of a single atom is anywhere
+from 20-120 s (depending on the values that are chosen for the quantum
+system), it's highly recommended that the parallel MPI version of the
+executable \texttt{main-mpi.out} is used. Since there is no
+interaction between the individual argon atoms, parallelization is
+straightforward. The laser simulation run on processor 0, as well as a
+single argon atom for radial grid point 0. Every other processor holds
+a single argon atom for the radial grid points 1 to N.  When the
+electron density or nonlinear polarization is calculated, the laser
+field for each radial point is distributed to every processor using
+\texttt{MPI\_Scatter}. Everyone calculates the electron density and
+nonlinear dipole moment, then sends their results back to processor 0
+using \texttt{MPI\_Gather}. Since there is currently the limitation of
+one quantum system per radial grid point, it is necessary to launch
+the executable with the same number of threads as radial grid points
+defined in \texttt{[space]}. If this is not the case, the program
+signals an error.
+
+A good set of parameters to start with for Argon gas at 15 C, 1 atm
+are the following:
+\begin{lstlisting}
+[argon]
+Nr = 300
+Nl = 21
+Nmask = 100
+step_size = 1
+potential = short-range-potential.dat
+ionization_box_size = 40
+density_of_neutrals = 2.55e25
+collision_time = 190e-15
+ionization_potential = 2.5250303e-18
+\end{lstlisting}
+where \texttt{Nr} is the number of grid points in radius for the
+wavefunction (the spacing in $r$, $\Delta r$ is fixed at 0.25 in
+atomic units), \texttt{Nl} is the number of angular momentum states,
+\texttt{Nmask} is the number of radial grid points for the absorber,
+\texttt{step\_size} is the time scale (in atomic units) on which the
+wave function evolves, \texttt{potential} is the filename that
+contains the short range potentials of argon for $l=0,1,2$ states. The
+parameter \texttt{ionization\_box\_size} specifies the number of
+radial grid points above which the wavefunction is considered ionized
+(i.e. the part of the wavefunction that is outside of this sphere is
+considered part of the free electron probability). Finally, for
+scaling the single atom response up to a macroscopic response, it's
+necessary to define the density of neutrals.
+
+Nonlinear effects from plasma are also added and contribute a current:
+\[\frac{\partial J_{\mathrm{PL}}}{\partial t} + \frac{J_{\mathrm{PL}}(t)}{\tau_c} = \frac{e^2}{2 m_e} \rho(t) E(t)\]
+where $\tau_c$ is the \texttt{collision\_time}. Nonlinear absorption
+due to ionization is also added using:
+
+Nonlinear effects from plasma are also added:
+\[J_{\mathrm{NA}}(t) = \frac{W(E(t))}{I(t)} U_i \left(f\rho_{nt} -
+    \rho(t)\right) \epsilon_0 c E(t)\]
+where $U_i$ is the \texttt{ionization\_potential}.
+
+
 
 \end{document}
