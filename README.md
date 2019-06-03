@@ -18,24 +18,24 @@ make
 This will produce the executable `main.out`
 
 # Usage
-## Input file
-The type of simulation, inclusion of physical phenomena, and control of output files are controled with an input file containing the parameters of the simulation.
+## Parameter file
+The type of simulation, inclusion of physical phenomena, and control of output files are controled with an parameter file containing the parameters of the simulation.
 
-The input file syntax is similar to an ini file, in that pairs of key=value are grouped under sections (surrounded by square braces \[\]). Comments are denoted with a # and any text after them is ignored. Here is an example:
+The parameter file syntax is similar to an ini file, in that pairs of key=value are grouped under sections (surrounded by square braces \[\]). Comments are denoted with a # and any text after them is ignored. Here is an example:
 ```shell
 [propagation]
 starting_distance = 0
 ending_distance = 1 # final propagation distance of simulation
 ```
 
-Since the input file is used to control the simulation there are some sections that are required and others that are optional. See the documentation for a complete description of all available sections.
+Since the parameter file is used to control the simulation there are some sections that are required and others that are optional. See the documentation for a complete description of all available sections.
 
 ## Running
  To run the simulation use
 ```shell
 ./main.out [filename]
 ```
-During runtime, the simulation writes to the terminal and to a file called `log`. The file log contains a listing of the input parameters plus any calculated values:
+During runtime, the simulation writes to the terminal and to a file called `log`. The file log contains a listing of the parameters plus any calculated values:
 ```shell
 *** Parameters ***
 calculated/Pcr: 1.20036e+10
@@ -73,9 +73,15 @@ Elapsed: 00:00:48
 ## Displaying the results
 The directory `plotting` contains a set of Python3 scripts for displaying the results of a simulation run. These files require Python3, as well as the libraries numpy, scipy, and matplotlib to be installed.
 
-Most scripts take two arguments: the input file path and a distance. For example, to plot the on-axis electric field at a distance of 0.25 m use:
+There is a GUI that is included called `gui.py`. After running
 ```shell
-python3 onaxis.py mysimulation/input_file 0.25
+python3 gui.py
+```
+the user must click `open` and point the program to the parameter file of the simulation. A drop down menu is then populated with the distances at which the fields and electron density were written. Select a distance and then click one of the buttons below. Each button press runs another python script that does the actual plotting. It's possible to use these other script directly as well.
+
+Most scripts take two arguments: the parameter file path and a distance. For example, to plot the on-axis electric field at a distance of 0.25 m use:
+```shell
+python3 onaxis.py mysimulation/parameter_file 0.25
 ```
 
 The provided scripts can display the following items: 
@@ -101,7 +107,7 @@ import load
 results = load.Results(input_filename)
 z, E = results.electric_field(distance)
 
-(plotting code)
+# add plotting code below
 ```
 # Examples
 There are two provided input files found in the directory `examples`, one for freespace propagation and one for propagation in a capillary.
