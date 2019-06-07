@@ -2,7 +2,7 @@
 #define IONIZATION_H_
 
 #include <vector>
-#include "array2d.h"
+#include "../core/array2d.h"
 
 class Radial;
 

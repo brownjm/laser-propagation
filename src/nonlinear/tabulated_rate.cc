@@ -1,7 +1,7 @@
 #include "tabulated_rate.h"
-#include "io.h"
-#include "constants.h"
-#include "radial.h"
+#include "../util/io.h"
+#include "../util/constants.h"
+#include "../core/radial.h"
 
 TabulatedRate::TabulatedRate(const std::string& filename, double density_of_neutrals,
                        double pressure, double ionizing_fraction)

@@ -1,8 +1,8 @@
 #ifndef SIMULATION_DATA_H_
 #define SIMULATION_DATA_H_
 
-#include "radial.h"
-#include "array2d.h"
+#include "../core/radial.h"
+#include "../core/array2d.h"
 
 class Propagator;
 

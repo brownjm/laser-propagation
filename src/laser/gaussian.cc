@@ -1,5 +1,5 @@
 #include "gaussian.h"
-#include "constants.h"
+#include "../util/constants.h"
 #include <iostream>
 
 namespace Field {

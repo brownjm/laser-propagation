@@ -2,12 +2,12 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
-#include "io.h"
+#include "../util/io.h"
 #include "driver.h"
 #include "propagator.h"
-#include "result.h"
-#include "util.h"
-#include "timer.h"
+#include "../results/result.h"
+#include "../util/util.h"
+#include "../util/timer.h"
 
 
 Driver::Driver(Propagator& prop)

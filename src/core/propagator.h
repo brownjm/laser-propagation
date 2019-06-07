@@ -6,13 +6,13 @@
 #include <memory>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv2.h>
-#include "field.h"
+#include "../laser/field.h"
 #include "radial.h"
 #include "array2d.h"
-#include "ionization.h"
-#include "simulation_data.h"
-#include "nonlinear_response.h"
-#include "linear.h"
+#include "../nonlinear/ionization.h"
+#include "../results/simulation_data.h"
+#include "../nonlinear/nonlinear_response.h"
+#include "../linear/linear.h"
 
 
 

@@ -1,7 +1,7 @@
 #include "argon_response_pool.h"
 #include "argon.h"
-#include "radial.h"
-#include "io.h"
+#include "../core/radial.h"
+#include "../util/io.h"
 #include <mpi.h>
 
 ArgonResponsePool::ArgonResponsePool(int Nr, int Nl, int Nmask,

@@ -1,7 +1,7 @@
 #include "argon_response.h"
 #include "argon.h"
-#include "radial.h"
-#include "io.h"
+#include "../core/radial.h"
+#include "../util/io.h"
 
 ArgonResponse::ArgonResponse(int Nr, int Nl, int Nmask,
                              const std::string& filename_potentials,

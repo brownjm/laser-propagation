@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <gsl/gsl_sf_bessel.h>
 #include "radial.h"
-#include "constants.h"
-#include "io.h"
+#include "../util/constants.h"
+#include "../util/io.h"
 #include <iostream>
 
 #include <Eigen/Dense>

@@ -3,7 +3,7 @@
 
 #include <complex>
 #include <vector>
-#include "array2d.h"
+#include "../core/array2d.h"
 
 typedef std::complex<double> complex;
 

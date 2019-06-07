@@ -1,8 +1,8 @@
 #ifndef TABULATED_RATE_H_
 #define TABULATED_RATE_H_
 
-#include "ionization.h"
-#include "interpolate.h"
+#include "../nonlinear/ionization.h"
+#include "../util/interpolate.h"
 
 class TabulatedRate : public Ionization {
 public:

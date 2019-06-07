@@ -1,10 +1,10 @@
 #include "propagator.h"
-#include "constants.h"
-#include "field.h"
+#include "../util/constants.h"
+#include "../laser/field.h"
 #include "radial.h"
-#include "util.h"
-#include "linear.h"
-#include "io.h"
+#include "../util/util.h"
+#include "../linear/linear.h"
+#include "../util/io.h"
 #include <iostream>
 #include <iomanip>
 #include <limits>

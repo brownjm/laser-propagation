@@ -1,6 +1,6 @@
 #include "util.h"
 #include "constants.h"
-#include "radial.h"
+#include "../core/radial.h"
 #include <algorithm>
 //#include <iostream>
 

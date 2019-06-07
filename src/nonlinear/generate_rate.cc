@@ -1,6 +1,6 @@
 #include <gsl/gsl_sf_dawson.h>
 #include "generate_rate.h"
-#include "constants.h"
+#include "../util/constants.h"
 
 GenerateRate::GenerateRate(double Ip, double wavelength)
   :Z(1), n(1), l(0), m(0) {

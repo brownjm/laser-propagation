@@ -4,7 +4,7 @@
 #include "ionization.h"
 #include "nonlinear_response.h"
 #include "argon.h"
-#include "array2d.h"
+#include "../core/array2d.h"
 
 void prepare_workers_for_electron_density();
 void prepare_workers_for_response();

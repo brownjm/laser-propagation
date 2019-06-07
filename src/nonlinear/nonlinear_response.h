@@ -1,7 +1,7 @@
 #ifndef NONLINEAR_RESPONSE
 #define NONLINEAR_RESPONSE
 
-#include "array2d.h"
+#include "../core/array2d.h"
 
 // This is a base class for all nonlinear medium responses
 class NonlinearResponse {

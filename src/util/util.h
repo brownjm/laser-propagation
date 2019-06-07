@@ -4,7 +4,7 @@
 #include <vector>
 #include <complex>
 
-#include "array2d.h"
+#include "../core/array2d.h"
 
 class Radial;
 

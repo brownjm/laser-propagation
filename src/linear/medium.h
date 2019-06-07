@@ -4,8 +4,8 @@
 #include <complex>
 #include <functional>
 #include <gsl/gsl_spline.h>
-#include "constants.h"
-#include "io.h"
+#include "../util/constants.h"
+#include "../util/io.h"
 
 namespace Medium {
 
