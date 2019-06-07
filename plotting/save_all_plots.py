@@ -28,14 +28,14 @@ input_file = sys.argv[1]
 r = load.Results(input_file)
 
 
-output_files = ['temporal_field', 'spectral_field', 'electron_density']
-output_files = [join('output', o) for o in output_files]
+results_files = ['temporal_field', 'spectral_field', 'electron_density']
+results_files = [join('results', o) for o in results_files]
 funcs = [temporal.plot, spectral.plot, density.plot]
 
-for func, output in zip(funcs, output_files):
+for func, results in zip(funcs, results_files):
     for i, z in enumerate(r.distances):
         func(input_file, z)
-        filename = r._make_filename(r.config[output], i).replace('dat', 'png')
+        filename = r._make_filename(r.config[results], i).replace('dat', 'png')
         plt.savefig(filename)
         print('Wrote:', filename)
         plt.close('all')
