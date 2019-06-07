@@ -43,7 +43,10 @@ void ArgonResponse::calculate_electron_density(const Radial& electric_field,
     }
     
     for (int j = 0; j < Nt; ++j) {
-      electron_density(i, j) = density_of_neutrals * probability_free[j];
+      // argon gnd state has two electrons in m=0
+      // use this prob_free instead of SAE prob.
+      double prob_free = 1 - std::pow(1 - probability_free[j], 2);
+      electron_density(i, j) = density_of_neutrals * prob_free;
       dipole(i, j) = dipole_atomic[j];
     }
     // calculate rate of ionization by differentiating ionization using midpoint rule
@@ -74,7 +77,9 @@ void ArgonResponse::calculate_response(const std::vector<double>& radius,
     argon.calculate_dipole(field_atomic, field_atomic_dt, atomic_dt, dipole_atomic);
     for (std::size_t j = 0; j < time.size(); ++j) {
       double nonlinear_dipole = dipole(i, j) - scale_factor * dipole_atomic[j];
-      response(i, j) += density_of_neutrals * au_dipole * nonlinear_dipole;
+
+      // there are two m=0 electrons in argon, multiply response by 2
+      response(i, j) += 2 * density_of_neutrals * au_dipole * nonlinear_dipole;
     }
   }
 }

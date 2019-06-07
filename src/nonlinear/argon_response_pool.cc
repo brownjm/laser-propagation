@@ -66,7 +66,10 @@ void ArgonResponsePool::calculate_electron_density(const Radial& electric_field,
   // set values for electron density in SI units
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Nt; ++j) {
-      electron_density(i, j) = density_of_neutrals * probability_free(i, j);
+      // argon gnd state has two electrons in m=0
+      // use this prob_free instead of SAE prob.
+      double prob_free = 1 - std::pow(1 - probability_free(i, j), 2);
+      electron_density(i, j) = density_of_neutrals * prob_free;
     }
   }
 
@@ -112,7 +115,9 @@ void ArgonResponsePool::calculate_response(const std::vector<double>&,
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Nt; ++j) {
       double nonlinear_dipole = dipole(i, j) - dipole_linear(i, j);
-      response(i, j) += density_of_neutrals * au_dipole * nonlinear_dipole;
+      
+      // there are two m=0 electrons in argon, multiply response by 2
+      response(i, j) += 2 * density_of_neutrals * au_dipole * nonlinear_dipole;
     }
   }
 }
