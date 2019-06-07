@@ -68,11 +68,7 @@ void ArgonResponsePool::calculate_electron_density(const Radial& electric_field,
     for (int j = 0; j < Nt; ++j) {
       // argon gnd state has two electrons in m=0
       // use this prob_free instead of SAE prob.
-<<<<<<< HEAD
       double prob_free = 1 - std::pow(1 - probability_free(i, j), 2);
-=======
-      double prob_free = 1 - std::pow(1 - probability_free[j], 2);
->>>>>>> 628fabaadda4d403ee9f074a5119391832c143bc
       electron_density(i, j) = density_of_neutrals * prob_free;
     }
   }
