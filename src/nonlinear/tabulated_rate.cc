@@ -27,7 +27,7 @@ void TabulatedRate::calculate_electron_density(const Radial& electric_field,
   double eta = ionizing_fraction * density_of_neutrals * dt / 2;
   for (int i = 0; i < electric_field.Nradius; ++i) {
     double E = electric_field.rt(i, 0).real();
-    double I = Constants::epsilon_0*Constants::c * std::pow(E, 2);
+    double I = 0.5 * Constants::epsilon_0*Constants::c * std::pow(E, 2);
     ionization_rate(i, 0) = rate(I);
     electron_density(i, 0) = eta * ionization_rate(i, 0);
     for (int j = 1; j < electric_field.Ntime; ++j) {
