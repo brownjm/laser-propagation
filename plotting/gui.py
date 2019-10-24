@@ -125,8 +125,7 @@ class Application(tk.Frame):
 
         self.max_density = ttk.Button(self.bottom, text='Max \u03c1(z)')
         self.max_density['command'] = lambda: self.launch_script('max_density.py',
-                                                                 self.input_file.get(),
-                                                                 self.distances.get())
+                                                                 self.input_file.get())
         self.max_density.grid(row=4, column=2)
 
 
