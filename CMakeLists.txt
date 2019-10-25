@@ -69,3 +69,19 @@ add_executable(main-mpi.out
 target_compile_options(main-mpi.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
 target_link_libraries(main-mpi.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES}
   Eigen3::Eigen ${MPI_LIBRARIES} MPI::MPI_CXX)
+
+
+# test program for argon
+add_executable(test-argon.out
+  src/test-argon.cc
+  src/util/io.cc
+  src/util/parameters.cc
+  src/util/util.cc
+  src/core/radial.cc
+  src/nonlinear/argon.cc
+  src/nonlinear/argon_response.cc
+  )
+
+target_compile_options(test-argon.out PUBLIC -Ofast -g -Wall -Wextra -pedantic -DHAVE_INLINE)
+target_link_libraries(test-argon.out ${SOURCES} ${FFTW_LIBRARIES} ${GSL_LIBRARIES}
+  Eigen3::Eigen)
