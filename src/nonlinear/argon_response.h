@@ -25,6 +25,8 @@ public:
                           Array2D<std::complex<double>>& response) override;
 
 
+  void save_wavefunction(const std::string& filename);
+  
 private:
   Argon argon;
   int Nradius, Nt;

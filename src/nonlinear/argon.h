@@ -33,6 +33,7 @@ public:
   double dipole();
   double accel(double F);
   double ionized();
+  void save_wavefunction(const std::string& filename);
 
 private:
   int Nr;

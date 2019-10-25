@@ -83,3 +83,7 @@ void ArgonResponse::calculate_response(const std::vector<double>& radius,
     }
   }
 }
+
+void ArgonResponse::save_wavefunction(const std::string& filename) {
+  argon.save_wavefunction(filename);
+}

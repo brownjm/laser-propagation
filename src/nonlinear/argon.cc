@@ -1,4 +1,5 @@
 #include "argon.h"
+#include "../util/io.h"
 #include <iostream>
 #include <fstream>
 
@@ -318,6 +319,10 @@ double Argon::accel(double F) {
     sum += 2*std::real(std::conj(two)*one);
   }
   return -sum*dr;
+}
+
+void Argon::save_wavefunction(const std::string& filename) {
+  IO::write_binary(filename, psi.values);
 }
 
 void Argon::stepH0(double dt, double loss) {
