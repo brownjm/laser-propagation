@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
 
     // perform quantum calculations
     argon.calculate_electron_density(electric_field, ionization_rate, electron_density);
+    argon.save_wavefunction("test_argon_wavefunction.dat");
     argon.calculate_response(radius, time, electric_field.temporal, electron_density, response);
 
 
@@ -66,7 +67,6 @@ int main(int argc, char* argv[]) {
     IO::write("test_argon_ionization_rate.dat", time, ionization_rate.values);
     IO::write("test_argon_electron_density.dat", time, electron_density.values);
     IO::write("test_argon_nonlinear_dipole.dat", time, nonlinear_dipole);
-    argon.save_wavefunction("test_argon_wavefunction.dat");
   }
   catch (std::exception& err) {
     std::cerr << err.what() << "\n";
