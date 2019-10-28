@@ -50,11 +50,11 @@ void ArgonResponse::calculate_electron_density(const Radial& electric_field,
       dipole(i, j) = dipole_atomic[j];
     }
     // calculate rate of ionization by differentiating ionization using midpoint rule
-    ionization_rate(i, 0) = (probability_free[1] - 0.0) / (2*field_dt);
+    ionization_rate(i, 0) = 0.0; // assume rate starts at zero
     for (int j = 1; j < Nt-1; ++j) {
       ionization_rate(i, j) = (probability_free[j+1] - probability_free[j-1]) / (2*field_dt);
     }
-    ionization_rate(i, Nt-1) = (0.0 - probability_free[Nt-2]) / (2*field_dt);
+    ionization_rate(i, Nt-1) = ionization_rate(i, Nt-2); // last value equal to previous value
   }
 }
 
