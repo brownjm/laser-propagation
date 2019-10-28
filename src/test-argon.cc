@@ -23,13 +23,17 @@ int main(int argc, char* argv[]) {
     // read in electric field file
     // convert E(r=0,t) into a Radial class
     std::vector<std::complex<double>> field_data;
+    std::vector<double> onaxis(Ntime);
     IO::read_binary(argv[2], field_data);
     Radial electric_field(Ntime, time_min, time_max, wavelength_min, wavelength_max, 1, 1, 1);
     for (int j = 0; j < Ntime; ++j) {
       electric_field.rt(0, j) = field_data[j];
+      onaxis[j] = std::real(field_data[j]);
     }
     std::vector<double> radius = electric_field.radius;
     std::vector<double> time = electric_field.time;
+
+    IO::write("test_argon_onaxis_field.dat", time, onaxis);
     
     // set up argon atom
     int Nr = p.get<int>("argon/Nr");
@@ -59,9 +63,9 @@ int main(int argc, char* argv[]) {
     }
     
     // output data
-    IO::write("test_argon_ionization_rate.txt", time, ionization_rate.values);
-    IO::write("test_argon_electron_density.txt", time, electron_density.values);
-    IO::write("test_argon_nonlinear_dipole.txt", time, nonlinear_dipole);
+    IO::write("test_argon_ionization_rate.dat", time, ionization_rate.values);
+    IO::write("test_argon_electron_density.dat", time, electron_density.values);
+    IO::write("test_argon_nonlinear_dipole.dat", time, nonlinear_dipole);
     argon.save_wavefunction("test_argon_wavefunction.dat");
   }
   catch (std::exception& err) {
