@@ -198,34 +198,33 @@ void Argon::calculate_dipole_ionization(const std::vector<double>& field,
   }
 }
 
-double Argon::norm() {
-  double N = 0;
+void Argon::normalize() {
+  // calculate the norm of the wavefunction: sum_l integral |psi_l|^2 dr
+  double sum = 0;
   for (int l = 0; l < Nl; ++l) {
     for (int i = 0; i < Nr; ++i) {
-      N += std::norm(psi(l,i));
+      sum += std::norm(psi(l,i));
     }
   }
-  return std::sqrt(N*dr);
-}
-
-void Argon::normalize() {
-  double N = norm();
+  double norm = sum * dr;
+  double sqrt_norm = std::sqrt(norm);
+  // normalize the wavefunction
   for (int l = 0; l < Nl; ++l) {
     for (int i = 0; i < Nr; ++i) {
-      psi(l,i) /= N;
+      psi(l,i) /= sqrt_norm;
     }
   }
 }
 
 double Argon::ionized() {
-  double N = 0;
+  double sum = 0;
   for (int l = 0; l < Nl; ++l) {
     for (int i = 0; i < ionization_box_size; ++i) {
-      N += std::norm(psi(l,i));
+      sum += std::norm(psi(l,i));
     }
   }
-  double P = std::sqrt(N*dr);
-  return 1 - P;
+  double norm = sum * dr;
+  return 1 - norm;
 }
 
 double Argon::energy() {
