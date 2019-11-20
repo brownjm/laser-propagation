@@ -171,6 +171,12 @@ int main(int argc, char* argv[]) {
                                                    Nradius, Ntime, atomic_dt,
                                                    density_of_neutrals*pressure);
 
+      // optionally set temporal filter
+      if (p.key_exists("argon/filter_start_time")) {
+        double filter_start_time = p.get<double>("argon/filter_start_time");
+        argon->initialize_temporal_filter(prop.field.time, filter_start_time);
+      }
+
       // calculate ionization and nonlinear polarization using Argon
       prop.add_ionization(argon);
       prop.add_polarization(argon);

@@ -2,6 +2,7 @@
 #include "argon.h"
 #include "../core/radial.h"
 #include "../util/io.h"
+#include "../util/constants.h"
 #include <mpi.h>
 
 ArgonResponsePool::ArgonResponsePool(int Nr, int Nl, int Nmask,
@@ -13,11 +14,15 @@ ArgonResponsePool::ArgonResponsePool(int Nr, int Nl, int Nmask,
    Nradius(Nradius), Nt(Nt), atomic_dt(atomic_dt), density_of_neutrals(density_of_neutrals),
    field_atomic(Nradius, Nt), dipole(Nradius, Nt), probability_free(Nradius, Nt),
    dipole_linear(Nradius, Nt), local_field_atomic(Nt), local_dipole(Nt),
-   local_probability_free(Nt), local_dipole_linear(Nt) {
+   local_probability_free(Nt), local_dipole_linear(Nt),
+   temporal_filter(Nt) {
   int steps = 3000;
   double dt = 0.1;
   double loss = 1;
   argon.find_ground_state(steps, dt, loss);
+
+  // initialize the temporal filter to ones
+  std::fill(std::begin(temporal_filter), std::end(temporal_filter), 1.0);
 }
 
 void ArgonResponsePool::calculate_electron_density(const Radial& electric_field,
@@ -115,12 +120,30 @@ void ArgonResponsePool::calculate_response(const std::vector<double>&,
   for (int i = 0; i < Nradius; ++i) {
     for (int j = 0; j < Nt; ++j) {
       double nonlinear_dipole = dipole(i, j) - dipole_linear(i, j);
+
+      // filter the dipole
+      nonlinear_dipole *= temporal_filter[j];
       
       // there are two m=0 electrons in argon, multiply response by 2
       response(i, j) += 2 * density_of_neutrals * au_dipole * nonlinear_dipole;
     }
   }
 }
+
+void ArgonResponsePool::initialize_temporal_filter(std::vector<double>& time,
+                                                   double filter_start_time) {
+  int index = 0;
+  for (auto t : time) {
+    if (t < filter_start_time) ++index;
+  }
+
+  for (int j = index; j < Nt; ++j) {
+    double cos = std::cos(Constants::pi/2 * (j - index) / (Nt-index-1));
+    temporal_filter[j] = std::pow(cos, 2);
+  }
+}
+
+
 
 void prepare_workers_for_electron_density() {
   int flag = 1;

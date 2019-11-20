@@ -27,6 +27,8 @@ public:
                           const Array2D<std::complex<double>>& electric_field,
                           const Array2D<double>& electron_density,
                           Array2D<std::complex<double>>& response) override;
+
+  void initialize_temporal_filter(std::vector<double>& time, double filter_start_time);
   
 private:
   Argon argon;
@@ -37,6 +39,7 @@ private:
   const double au_time = 2.418884326509e-17;
   Array2D<double> field_atomic, dipole, probability_free, dipole_linear;
   std::vector<double> local_field_atomic, local_dipole, local_probability_free, local_dipole_linear;
+  std::vector<double> temporal_filter;
 };
 
 #endif // ARGON_RESPONSE_POOL_H_

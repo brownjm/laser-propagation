@@ -26,6 +26,7 @@ public:
 
 
   void save_wavefunction(const std::string& filename);
+  void initialize_temporal_filter(std::vector<double>& time, double filter_start_time);
   
 private:
   Argon argon;
@@ -36,6 +37,7 @@ private:
   const double au_time = 2.418884326509e-17;
   std::vector<double> field_atomic, probability_free, dipole_atomic;
   Array2D<double> dipole;
+  std::vector<double> temporal_filter;
 };
 
 #endif // ARGON_RESPONSE_H_
