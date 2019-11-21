@@ -2,6 +2,7 @@
 #include "argon.h"
 #include "../core/radial.h"
 #include "../util/io.h"
+#include "../util/constants.h"
 
 ArgonResponse::ArgonResponse(int Nr, int Nl, int Nmask,
                              const std::string& filename_potentials,
@@ -11,11 +12,14 @@ ArgonResponse::ArgonResponse(int Nr, int Nl, int Nmask,
   :argon(Nr, Nl, Nmask, filename_potentials, ionization_box_size),
    Nradius(Nradius), Nt(Nt), atomic_dt(atomic_dt), density_of_neutrals(density_of_neutrals),
    field_atomic(Nt), probability_free(Nt), dipole_atomic(Nt),
-   dipole(Nradius, Nt) {
+   dipole(Nradius, Nt), temporal_filter(Nt) {
   int steps = 3000;
   double dt = 0.1;
   double loss = 1;
   argon.find_ground_state(steps, dt, loss);
+
+  // initialize the temporal filter to ones
+  std::fill(std::begin(temporal_filter), std::end(temporal_filter), 1.0);
 }
 
 void ArgonResponse::calculate_electron_density(const Radial& electric_field,
@@ -49,6 +53,7 @@ void ArgonResponse::calculate_electron_density(const Radial& electric_field,
       electron_density(i, j) = density_of_neutrals * prob_free;
       dipole(i, j) = dipole_atomic[j];
     }
+
     // calculate rate of ionization by differentiating ionization using midpoint rule
     ionization_rate(i, 0) = 0.0; // assume rate starts at zero
     for (int j = 1; j < Nt-1; ++j) {
@@ -78,6 +83,9 @@ void ArgonResponse::calculate_response(const std::vector<double>& radius,
     for (std::size_t j = 0; j < time.size(); ++j) {
       double nonlinear_dipole = dipole(i, j) - scale_factor * dipole_atomic[j];
 
+      // filter the dipole
+      nonlinear_dipole *= temporal_filter[j];
+
       // there are two m=0 electrons in argon, multiply response by 2
       response(i, j) += 2 * density_of_neutrals * au_dipole * nonlinear_dipole;
     }
@@ -87,3 +95,17 @@ void ArgonResponse::calculate_response(const std::vector<double>& radius,
 void ArgonResponse::save_wavefunction(const std::string& filename) {
   argon.save_wavefunction(filename);
 }
+
+void ArgonResponse::initialize_temporal_filter(std::vector<double>& time,
+                                               double filter_start_time) {
+  int index = 0;
+  for (auto t : time) {
+    if (t < filter_start_time) ++index;
+  }
+
+  for (int j = index; j < Nt; ++j) {
+    double cos = std::cos(Constants::pi/2 * (j - index) / (Nt-index-1));
+    temporal_filter[j] = std::pow(cos, 2);
+  }
+}
+
