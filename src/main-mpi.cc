@@ -336,14 +336,14 @@ void initialize_linear_medium(Propagator& prop, Parameters::Parameters& p) {
     p.set("calculated/gvd", gvd);
   }
   else if (type == "freespace") {
-    Linear::FreeSpace linear(index);
+    Linear::FreeSpace linear(index, pressure);
     prop.initialize_linear(linear, omega0);
     
     double gvd = linear.gvd(0, omega0);
     p.set("calculated/gvd", gvd);
   }
   else if (type == "diffractionless") {
-    Linear::DiffractionLess linear(index);
+    Linear::DiffractionLess linear(index, pressure);
     prop.initialize_linear(linear, omega0);
 
     double gvd = linear.gvd(0, omega0);

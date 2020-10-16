@@ -1,8 +1,8 @@
 #include "linear.h"
 
 namespace Linear {
-  Base::Base(Medium::IndexFunction linear_index)
-    :n(linear_index) {}
+  Base::Base(Medium::IndexFunction linear_index, double pressure)
+    :n(linear_index), pressure(pressure) {}
   
   double Base::group_velocity(double kperp, double omega) const {
     double domega = 1e-2 * omega;
@@ -21,7 +21,7 @@ namespace Linear {
 
   
   std::complex<double> FreeSpace::kz(double kperp, double omega) const {
-    std::complex<double> index = n(omega);
+    std::complex<double> index = Medium::pressurize(pressure, n, omega);
     double k0 = omega / Constants::c;
     double k = std::real(index) * k0;
     double alpha = 2*std::imag(index) * k0;
