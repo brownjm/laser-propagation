@@ -30,8 +30,8 @@ double Util::energy(const Radial& field) {
   // integral *= 2*Constants::pi;
 
   double integral = 0;
-  for (int i = field.Nradius-1; i >=0; --i) {
-    integral += (radius[i]*aux[i] + radius[i-1]*aux[i-1]) / 2 * (radius[i] - radius[i-1]);
+  for (int i = field.Nradius-1; i > 0; --i) {
+      integral += (radius[i]*aux[i] + radius[i-1]*aux[i-1]) / 2 * (radius[i] - radius.at(i-1));
   }
   integral += aux[0] * std::pow(radius[0], 2) / 4;
   integral *= 2*Constants::pi;
