@@ -31,9 +31,9 @@ ending_distance = 1 # final propagation distance of simulation
 Since the parameter file is used to control the simulation there are some sections that are required and others that are optional. See the documentation for a complete description of all available sections.
 
 ## Running
- To run the simulation use
+ To run the simulation, pass the filename of the parameter file as a command line argument to the generated executable:
 ```shell
-./main.out [filename]
+./main.out parameter_filename
 ```
 During runtime, the simulation writes to the terminal and to a file called `log`. The file log contains a listing of the parameters plus any calculated values:
 ```shell
