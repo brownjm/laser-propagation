@@ -10,7 +10,6 @@ def plot(input_file, z):
     cm = z * 100
     fs = r.time * 1e15
     mm = r.radius * 1e3
-    mm = numpy.hstack((0, mm))
 
     fig, ax = plt.subplots()
     v = max(E.real.max(), -E.real.min())
