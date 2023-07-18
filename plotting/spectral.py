@@ -2,7 +2,7 @@
 import argparse
 import numpy
 from scipy.constants import pi, epsilon_0, c
-from matplotlib import colors, cm
+from matplotlib import colors, colormaps
 import matplotlib.pyplot as plt
 import load
 
@@ -27,12 +27,12 @@ def plot(input_file, z):
         
     else:
         kperp = numpy.hstack((0, r.kperp))
-        m = ax.pcolormesh(order, kperp, I, norm=colors.LogNorm(1e-6, 1))
+        m = ax.pcolormesh(order, r.kperp, I, norm=colors.LogNorm(1e-6, 1), shading='nearest')
         ax.set_ylabel('kperp [1/m]')
         
     plt.colorbar(m, ax=ax)
-    cmap = cm.get_cmap()
-    cmap.set_bad(cmap(0))    
+    cmap = colormaps.get_cmap('viridis')
+    cmap.set_bad(cmap(0))
     ax.set_xlabel('harmonic order')
     ax.set_title('Spectral intensity [scaled], z = {:1.2f}cm'.format(z*100))
     fig.tight_layout()
