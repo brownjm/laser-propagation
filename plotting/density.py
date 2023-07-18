@@ -10,7 +10,6 @@ def plot(input_file, z):
     z, rho = r.electron_density(z)
     fs = r.time * 1e15
     mm = r.radius * 1e3
-    mm = numpy.hstack((0, mm))
     cm = z * 100
     
     fig, ax = plt.subplots()
